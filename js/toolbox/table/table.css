@@ -1,0 +1,118 @@
+/* .dtbl{border-collapse:collapse;width:100%}
+.dtbl-sticky thead th{position:sticky;top:0;background:#fff;z-index:1}
+.dtbl thead th{border-bottom:1px solid #e5e7eb;padding:.45rem .55rem;white-space:nowrap}
+.dtbl td{padding:.4rem .55rem;border-bottom:1px solid #f1f5f9}
+.dtbl tbody tr:nth-child(odd){background:#fafafa}
+.dtbl thead th .dtbl-sort{margin-left:.35rem;opacity:.6;font-size:.8em}
+.dtbl-toolbar{display:flex;gap:.5rem;align-items:center;margin:.5rem 0;flex-wrap:wrap}
+.dtbl-search{padding:.35rem .5rem;min-width:240px}
+.dtbl-dl{display:flex;gap:.5rem}
+.dtbl-dl button,.dtbl-pager button{padding:.35rem .6rem;cursor:pointer;border:1px solid #e5e7eb;border-radius:6px;background:#f8fafc}
+.dtbl-pager{display:flex;gap:.5rem;align-items:center;margin:.5rem 0}
+.dtbl-page-label{min-width:7.5rem;text-align:center} */
+
+/* barre */
+.dtbl-toolbar {
+    display: flex;
+    align-items: center;
+}
+.dtbl-btn.dtbl-btn-icon { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:1px solid #e5e7eb; border-radius:6px; background:#fff; cursor:pointer; }
+.dtbl-btn.dtbl-btn-icon:hover { background:#f8fafc; }
+
+/* popup contenu */
+.dtbl-dl__stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px 12px; margin-bottom:12px; font-size:.9rem; border: solid 3px #f8fafc; padding: 8px;}
+.dtbl-dl__scope { display:flex; gap:16px; align-items:center; margin:10px 0 14px 6px; flex-wrap:wrap; }
+.dtbl-dl__legend { font-weight:600; margin-right:6px; }
+.dtbl-dl__actions { display:flex; flex-wrap:wrap; gap:8px; }
+.dtbl-dl__btn, .dtbl-page-prev, .dtbl-page-next { padding:6px 12px; border:1px solid #e5e7eb; background:#fff; border-radius:6px; cursor:pointer; display: flex; align-items: center; gap: 6px;}
+.dtbl-dl__btn:hover, .dtbl-page-prev:not([disabled]):hover, .dtbl-page-next:not([disabled]):hover { background:#f3f4f6; }
+.dtbl-page-prev[disabled], .dtbl-page-next[disabled] {cursor: default;}
+
+.dtbl-dl__btn.btn-csv { color:#2e7d32; }
+.dtbl-dl__btn.btn-tsv { color:#388e3c; }
+.dtbl-dl__btn.btn-json{ color:#ef6c00; }
+.dtbl-dl__btn.btn-md  { color:#1565c0; }
+.dtbl-dl__btn.btn-copy{ color:#6a1b9a; }
+
+.dtbl-pager {
+    display: flex;
+    gap: 6px;
+    margin: 12px 0;
+    align-items: center;
+}
+
+th .dtbl-sort{ margin-left:6px; font-size:.9em; opacity:.75; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;}
+th.is-sorted .dtbl-sort{ opacity:1; }
+th .dtbl-sort-idx{
+  margin-left:4px; font-size:.7em; vertical-align:super; opacity:.85;
+  padding:0 .25em; border-radius:6px; background:rgba(212, 210, 210, 0.06);
+}
+
+:root{
+    --dtbl-row-even: #F5F5F5;
+    --dtbl-row-odd:  #fff;
+}
+
+
+.dtbl tbody tr.dtbl-row-odd  { background: var(--dtbl-row-odd); }
+.dtbl tbody tr.dtbl-row-even { background: var(--dtbl-row-even); }
+
+
+.table-1 {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+    color: #999999;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.table-1 td {
+    padding: 8px 12px;
+    text-align: center;
+}
+
+.table-1 thead > tr:nth-child(1) th:not(.outside):first-of-type {
+    border-radius: 8px 0 0 0;
+}
+
+.table-1 thead > tr:nth-child(1) th:not(.outside):last-of-type,
+.table-1 thead > tr:has(> th:last-child.outside) > th:nth-last-child(2) {
+    border-radius: 0 8px 0 0;
+}
+
+.table-1 th:not(.outside) {
+    background-color: #36304A;
+    font-weight: 400;
+    color: #f4f1f6;
+    text-align: center;
+    padding: 4px 12px;
+    min-width: max-content;
+    border-bottom: solid 1px #c1b8c7;
+}
+
+.table-1 tbody tr:hover td:not(.outside) {
+    color: #292929;
+}
+
+.table-1 td {
+    white-space: nowrap;
+}
+
+.table-1.static td {
+    border: solid 1px #d9d9d9;
+    color: #292929 !important;
+}
+
+.table-1 .outside {
+    background-color: var(--background-color);
+    border: none;
+    width: fit-content;
+    cursor: default;
+}
+
+.table-1 th .dtbl-sort { display:inline-block; width:1.2em; text-align:center; margin-left:6px; opacity:.75; }
+.table-1 th.is-sorted .dtbl-sort { opacity:1; }
+.table-1 th .dtbl-sort-idx{
+  display:inline-block; min-width:1.1em; margin-left:4px; font-size:.9em; vertical-align:super;
+  padding:0 .35em; border-radius:6px; background:#fff; color: #000000; position: absolute;
+}

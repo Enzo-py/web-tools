@@ -1,0 +1,4 @@
+.editable-text{display:inline-block;position:relative}
+.editable-text .edit{display:none;font:inherit;border:1px solid #ccc;padding:2px 6px;background:transparent}
+.editable-text.is-editing .view{display:none}
+.editable-text.is-editing .edit{display:inline-block}
