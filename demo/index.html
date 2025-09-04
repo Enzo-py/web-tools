@@ -480,6 +480,68 @@
             <section id="LoadingScreen">
             <div class="card">
                 <h2>Loading Screen</h2>
+
+                <div class="loading-doc">
+                    <p>
+                        The loading screen is designed to <strong>block the UI</strong> while tasks are running.  
+                        In a real application, it should only be closed when the process is finished.  
+                        For demo purposes, a <span style="color:#dc2626;font-weight:600;">red "hide" button</span> 
+                        is displayed in the top-right corner whenever the loading screen is active, so you can
+                        manually hide it and continue testing.
+                    </p>
+                    <p>
+                        Use the demo buttons to show the loading screen, seed steps, simulate progress, 
+                        or add/remove details. The close button is <em>only for demonstration</em> and 
+                        should be removed in production.
+                    </p>
+                </div>
+
+                <div class="demo-buttons">
+                    <button id="ls-show">Show</button>
+                    <button id="ls-seed">Seed steps</button>
+                    <button id="ls-progress">Simulate progress</button>
+                    <button id="ls-add-step">Add step</button>
+                    <button id="ls-demo-close">Hide</button>
+                    <button id="ls-reset">Reset</button>
+                </div>
+
+                <div class="block-js">
+                    <span class="js-comment">// Show empty screen</span>
+                    <br><span class="js-object">LoadingScreen</span>.<span class="js-func">show</span>();
+                    <br><span class="js-object">LoadingScreen</span>.<span class="js-func">update</span>({ main_steps: [], detail: { status: <span class="js-string">'idle'</span> } });
+                    <br>
+                    <br><span class="js-comment">// Seed a couple of steps</span>
+                    <br><span class="js-object">LoadingScreen</span>.<span class="js-func">update</span>({
+                    <br>&nbsp;&nbsp;main_steps: [
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;{ title: <span class="js-string">'Load dataset'</span>, progress: <span class="js-number">0.15</span>, info: <span class="js-string">'12/80'</span> },
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;{ title: <span class="js-string">'Build index'</span>,  progress: <span class="js-number">0</span> }
+                    <br>&nbsp;&nbsp;],
+                    <br>&nbsp;&nbsp;detail: { file: <span class="js-string">'data.csv'</span>, splits: <span class="js-number">2</span> }
+                    <br>});
+                    <br>
+                    <br><span class="js-comment">// Update progress over time</span>
+                    <br><span class="js-const">let</span> p = <span class="js-number">0</span>;
+                    <br><span class="js-object">LoadingScreen</span>.<span class="js-func">update</span>({
+                    <br>&nbsp;&nbsp;main_steps: [
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;{ title: <span class="js-string">'Load dataset'</span>, progress: p, info: <span class="js-string">'0/80'</span> },
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;{ title: <span class="js-string">'Build index'</span>,  progress: <span class="js-number">0</span> }
+                    <br>&nbsp;&nbsp;]
+                    <br>});
+                    <br>
+                    <br><span class="js-comment">// Add a new step</span>
+                    <br><span class="js-object">LoadingScreen</span>.<span class="js-func">update</span>({
+                    <br>&nbsp;&nbsp;main_steps: [
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;{ title: <span class="js-string">'Load dataset'</span>, progress: <span class="js-number">0.6</span>, info: <span class="js-string">'48/80'</span> },
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;{ title: <span class="js-string">'Build index'</span>,  progress: <span class="js-number">0.25</span> },
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;{ title: <span class="js-string">'Warmup cache'</span>, progress: <span class="js-number">0</span> }
+                    <br>&nbsp;&nbsp;],
+                    <br>&nbsp;&nbsp;detail: { node: <span class="js-string">'A1'</span>, host: <span class="js-string">'example.local'</span> }
+                    <br>});
+                    <br>
+                    <br><span class="js-comment">// Hide</span>
+                    <br><span class="js-object">LoadingScreen</span>.<span class="js-func">hide</span>();
+                </div>
+
             </div>
             </section>
 
@@ -487,11 +549,268 @@
             <section id="Navigator">
             <div class="card">
                 <h2>Navigator</h2>
-                <div id="navigator-mount" class="card"></div>
-                <div class="row">
-                <button id="nav-add-tab">Ajouter un onglet</button>
-                <button id="nav-del-tab">Supprimer l'onglet courant</button>
+
+                <div class="navigator-doc">
+                    <p>
+                        The <strong>Navigator</strong> component provides a lightweight tab system: 
+                        a navigation bar with multiple tabs and a content area below. 
+                        Each tab can hold HTML or DOM nodes, be closable, or even hidden 
+                        (so it doesn’t appear in the bar but can still be opened programmatically).
+                    </p>
+                    <p>
+                        In this demo:
+                    </p>
+                    <ul>
+                        <li>The <strong>Home</strong> tab is permanent and cannot be closed. It also shows a live list of all tabs (visible and hidden).</li>
+                        <li>You can add new tabs (regular or closable), open the hidden <em>Reports</em> tab, delete the current tab, or sort all tabs alphabetically with Home pinned first.</li>
+                        <li>Tabs created dynamically include placeholder text (“Lorem ipsum”) as sample content.</li>
+                    </ul>
+                    <p>
+                        This makes Navigator useful for dashboards, editors, or any app that needs 
+                        a flexible tabbed interface with programmatic control over opening, hiding, 
+                        and reordering tabs.
+                    </p>
                 </div>
+
+                <div class="demo-controls" style="display: flex; flex-direction: row; gap: 12px; align-items: flex-end;">
+                    <button id="nav-start">Start demo</button>
+
+                    <div class="form-block" style="display: flex; flex-direction: column;">
+                        <label for="nav-action" class="sr-only">Action</label>
+                        <select id="nav-action" class="form-input" disabled style="margin: 4px 0 0 0;">
+                            <option value="add">Add tab</option>
+                            <option value="add-closable">Add closable tab</option>
+                            <option value="open-hidden">Open hidden “Reports”</option>
+                            <option value="delete">Delete current</option>
+                            <option value="sort">Sort tabs (A→Z)</option>
+                            <option value="print">Print visible tabs</option>
+                        </select>
+                    </div>
+                    
+                    <button id="nav-run" disabled>Run</button>
+                </div>
+
+                <div id="nav-mount"></div>
+
+                <div class="block-js">
+                    <span class="js-comment">// 1) Create and draw</span>
+                    <br><span class="js-const">const</span> <span class="js-var js-var-def">nav</span> = <span class="js-keyword">new</span> <span class="js-class">Navigator</span>(<span class="js-number">6</span>, <span class="js-string">'Tab limit reached'</span>);
+                    <br>nav.<span class="js-func">draw</span>(<span class="js-string">'#nav-mount'</span>);
+                    <br>
+                    <br><span class="js-comment">// 2) Add tabs (some closable)</span>
+                    <br>nav.<span class="js-func">add</span>(<span class="js-string">'tab-A'</span>, <span class="js-string">'A'</span>, <span class="js-string">'&lt;h4&gt;Tab A&lt;/h4&gt;&lt;p&gt;Welcome to A.&lt;/p&gt;'</span>);
+                    <br>nav.<span class="js-func">add</span>(<span class="js-string">'tab-B'</span>, <span class="js-string">'B'</span>, <span class="js-string">'&lt;h4&gt;Tab B&lt;/h4&gt;&lt;p&gt;Some content in B.&lt;/p&gt;'</span>);
+                    <br>nav.<span class="js-func">add</span>(<span class="js-string">'tab-C'</span>, <span class="js-string">'C'</span>, <span class="js-string">'&lt;h4&gt;Tab C&lt;/h4&gt;&lt;p&gt;Charts, tables…&lt;/p&gt;'</span>, { closable:<span class="js-keyword">true</span> });
+                    <br>
+                    <br><span class="js-comment">// 3) Hidden tab (no button)</span>
+                    <br>nav.<span class="js-func">add_hidden</span>(<span class="js-string">'hidden-reports'</span>, <span class="js-string">'Reports (hidden)'</span>, <span class="js-string">'&lt;h4&gt;Hidden&lt;/h4&gt;&lt;p&gt;Opened programmatically.&lt;/p&gt;'</span>);
+                    <br>
+                    <br><span class="js-comment">// 4) Open / Set / Delete</span>
+                    <br>nav.<span class="js-func">open</span>(<span class="js-string">'tab-B'</span>);
+                    <br>nav.<span class="js-func">set</span>(<span class="js-string">'tab-B'</span>, <span class="js-string">'&lt;h4&gt;Updated&lt;/h4&gt;&lt;p&gt;Content replaced.&lt;/p&gt;'</span>);
+                    <br>nav.<span class="js-func">delete</span>(<span class="js-string">'tab-A'</span>);
+                    <br>
+                    <br><span class="js-comment">// 5) Reorder visible tabs</span>
+                    <br>nav.<span class="js-func">order</span>([<span class="js-string">'tab-C'</span>, <span class="js-string">'tab-B'</span>]);
+                    <br>
+                    <br><span class="js-comment">// 6) Print only visible tabs</span>
+                    <br>nav.<span class="js-func">print_tabs</span>( nav.<span class="js-func">ids</span>() );
+                </div>
+
+                <hr style="border-color: var(--darker-text);"/>
+
+                <div id="quick-start">
+                    <h3>Quick Start</h3>
+                    <p>
+                        Create a navigator, mount it, seed a couple of tabs, and open one:
+                    </p>
+                    <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">nav</span> =
+                        <span class="js-keyword">new</span> <span class="js-class">Navigator</span>(
+                        <span class="js-number">-1</span>,                        <span class="js-comment">// max_tab_number (-1 = no limit)</span>
+                        <span class="js-keyword">null</span>,                     <span class="js-comment">// max_tab_message (optional)</span>
+                        (<span class="js-var">id</span>) =&gt; {},                 <span class="js-comment">// open_tab_event (optional)</span>
+                        (<span class="js-var">id</span>) =&gt; {}                  <span class="js-comment">// delete_event (optional)</span>
+                        );
+                        <br><span class="js-var">nav</span>.<span class="js-func">draw</span>(<span class="js-string">'#mount'</span>);
+                        <br><span class="js-var">nav</span>.<span class="js-func">add</span>(<span class="js-string">'home'</span>, <span class="js-string">'Home'</span>, <span class="js-string">'&lt;h4&gt;Home&lt;/h4&gt;&lt;p&gt;Welcome.&lt;/p&gt;'</span>, { closable:<span class="js-keyword">false</span> });
+                        <br><span class="js-var">nav</span>.<span class="js-func">add</span>(<span class="js-string">'logs'</span>, <span class="js-string">'Logs'</span>, <span class="js-string">'&lt;h4&gt;Logs&lt;/h4&gt;&lt;p&gt;Streaming…&lt;/p&gt;'</span>, { closable:<span class="js-keyword">true</span> });
+                        <br><span class="js-var">nav</span>.<span class="js-func">open</span>(<span class="js-string">'home'</span>);
+                    </div>
+
+                    <!-- ========== Constructor & Mount ========== -->
+                    <h3>Constructor &amp; Mount</h3>
+                    <p>
+                        <code>new Navigator(max_tab_number = -1, max_tab_message = null, open_tab_event = null, delete_event = null)</code><br>
+                        Keep it short: set a limit if you need one; if the limit is reached and <em>max_tab_message</em> is provided,
+                        <code>add()</code> will not create the tab and will try <em>toast("warning", max_tab_message)</em> if present.
+                    </p>
+                    <p>
+                        <code>draw(target)</code> mounts the component into a container (CSS selector or element). It creates:
+                        <em>.navigator</em> → <em>.navigator-bar</em> (tab buttons) + <em>.navigator-content</em> (active tab content).
+                    </p>
+
+                    <div class="block-js">
+                        <span class="js-comment">// Mount into an existing element</span>
+                        <br><span class="js-var">nav</span>.<span class="js-func">draw</span>(<span class="js-string">'#mount'</span>);
+                    </div>
+                </div>
+                <br/><br/>
+                
+                <div id="table-systeme">
+                    <!-- ========== Adding & Updating Tabs ========== -->
+                    <h3>Adding &amp; Updating Tabs</h3>
+                    <p>
+                        <code>add(tab_id, tab_name, content, { closable = false, hidden = false, count_towards_limit = true })</code><br>
+                        <strong>content</strong> can be an HTML string or a DOM <em>Node</em>. If <em>hidden</em> is true, no button is created,
+                        but the tab can still be opened by id. <code>add_hidden(...)</code> is a convenience wrapper.
+                    </p>
+                    <div class="block-js">
+                        <span class="js-comment">// Visible tab, not closable</span>
+                        <br><span class="js-var">nav</span>.<span class="js-func">add</span>(<span class="js-string">'overview'</span>, <span class="js-string">'Overview'</span>,
+                        <span class="js-string">'&lt;h4&gt;Overview&lt;/h4&gt;&lt;p&gt;Landing content.&lt;/p&gt;'</span>,
+                        { closable:<span class="js-keyword">false</span> });
+                        <br>
+                        <br><span class="js-comment">// Hidden tab (no button in bar)</span>
+                        <br><span class="js-var">nav</span>.<span class="js-func">add_hidden</span>(<span class="js-string">'reports'</span>, <span class="js-string">'Reports (hidden)'</span>,
+                        <span class="js-string">'&lt;h4&gt;Reports&lt;/h4&gt;&lt;p&gt;Confidential KPIs.&lt;/p&gt;'</span>);
+                    </div>
+
+                    <p>
+                        <code>set(tab_id, new_content)</code> replaces the inner HTML/Node of an existing tab.
+                    </p>
+                    <div class="block-js">
+                        <span class="js-var">nav</span>.<span class="js-func">set</span>(<span class="js-string">'overview'</span>,
+                        <span class="js-string">'&lt;h4&gt;Overview&lt;/h4&gt;&lt;p&gt;Updated at runtime.&lt;/p&gt;'</span>);
+                    </div>
+
+                    <!-- ========== Opening & Deleting ========== -->
+                    <h3>Opening &amp; Deleting</h3>
+                    <p>
+                        <code>open(tab_id)</code> activates the tab: highlights the button (if visible) and shows its content.
+                        If you provided <em>open_tab_event</em>, it will be called with the opened id.
+                    </p>
+                    <div class="block-js">
+                        <span class="js-var">nav</span>.<span class="js-func">open</span>(<span class="js-string">'reports'</span>);
+                    </div>
+
+                    <p>
+                        <code>delete(tab_id)</code> removes both the tab button (if any) and the content node.  
+                        If the deleted tab was active, the next available tab is opened automatically.
+                        If you provided <em>delete_event</em>, it will be called with the deleted id.
+                    </p>
+                    <div class="block-js">
+                        <span class="js-comment">// Guard your own special tabs if needed</span>
+                        <br><span class="js-keyword">if</span> (<span class="js-var">nav</span>.<span class="js-var">current</span> !== <span class="js-string">'home'</span>) {
+                        <br>&nbsp;&nbsp;<span class="js-var">nav</span>.<span class="js-func">delete</span>(<span class="js-var">nav</span>.<span class="js-var">current</span>);
+                        <br>}
+                    </div>
+
+                    <!-- ========== Ordering & Listing ========== -->
+                    <h3>Ordering &amp; Listing</h3>
+                    <p>
+                        <code>order(tab_id_list)</code> reorders the <em>visible</em> tab buttons in the bar. Hidden tabs are not affected (no buttons).  
+                        <code>ids({ include_hidden = false })</code> returns the list of tab ids (visible only by default; include hidden if you need them).
+                    </p>
+                    <div class="block-js">
+                        <span class="js-comment">// Get visible ids and sort them by label; pin "home" first</span>
+                        <br><span class="js-const">const</span> <span class="js-var js-var-def">ids</span> = <span class="js-var">nav</span>.<span class="js-func">ids</span>();  <span class="js-comment">// visible only</span>
+                        <br><span class="js-const">const</span> <span class="js-var js-var-def">labeled</span> = <span class="js-var">ids</span>.<span class="js-func">map</span>(id =&gt; ({ id, label: <span class="js-var">nav</span>.<span class="js-var">tabs</span>.<span class="js-func">get</span>(id)?.<span class="js-var">label</span> ?? id }));
+                        <br><span class="js-var">labeled</span>.<span class="js-func">sort</span>((a,b) =&gt; a.<span class="js-var">label</span>.<span class="js-func">localeCompare</span>(b.<span class="js-var">label</span>, <span class="js-keyword">undefined</span>, { sensitivity:<span class="js-string">'base'</span> }));
+                        <br><span class="js-const">const</span> <span class="js-var js-var-def">homeIdx</span> = <span class="js-var">labeled</span>.<span class="js-func">findIndex</span>(x =&gt; x.<span class="js-var">id</span> === <span class="js-string">'home'</span>);
+                        <br><span class="js-keyword">if</span> (<span class="js-var">homeIdx</span> &gt; <span class="js-number">0</span>) { <span class="js-const">const</span> h = <span class="js-var">labeled</span>.<span class="js-func">splice</span>(<span class="js-var">homeIdx</span>, <span class="js-number">1</span>)[<span class="js-number">0</span>]; <span class="js-var">labeled</span>.<span class="js-func">unshift</span>(h); }
+                        <br><span class="js-var">nav</span>.<span class="js-func">order</span>( <span class="js-var">labeled</span>.<span class="js-func">map</span>(x =&gt; x.<span class="js-var">id</span>) );
+                    </div>
+
+                    <p>
+                        To list <em>all</em> tabs (visible + hidden) and inspect their labels/visibility:
+                    </p>
+                    <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">all</span> = <span class="js-var">nav</span>.<span class="js-func">ids</span>({ include_hidden:<span class="js-keyword">true</span> });
+                        <br><span class="js-const">const</span> <span class="js-var js-var-def">visible</span> = <span class="js-keyword">new</span> <span class="js-class">Set</span>( <span class="js-var">nav</span>.<span class="js-func">ids</span>() );
+                        <br><span class="js-const">const</span> <span class="js-var js-var-def">details</span> = <span class="js-var">all</span>.<span class="js-func">map</span>(id =&gt; {
+                        <br>&nbsp;&nbsp;<span class="js-const">const</span> t = <span class="js-var">nav</span>.<span class="js-var">tabs</span>.<span class="js-func">get</span>(id);
+                        <br>&nbsp;&nbsp;<span class="js-keyword">return</span> { id, label: t?.<span class="js-var">label</span> ?? id, hidden: !<span class="js-var">visible</span>.<span class="js-func">has</span>(id) };
+                        <br>});
+                    </div>
+                </div>
+                <br/><br/>
+
+                <div id="event-system">
+                    <!-- ========== Events ========== -->
+                    <h3>Events</h3>
+                    <p>
+                        Two optional callbacks are provided at construction:
+                        <code>open_tab_event(tab_id)</code> and <code>delete_event(tab_id)</code>.
+                        Use them to sync external state (e.g., analytics, router).
+                    </p>
+                    <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">navEv</span> =
+                        <span class="js-keyword">new</span> <span class="js-class">Navigator</span>(<span class="js-number">-1</span>, <span class="js-keyword">null</span>,
+                        (<span class="js-var">id</span>) =&gt; <span class="js-func">console</span>.<span class="js-func">log</span>(<span class="js-string">'opened'</span>, <span class="js-var">id</span>),
+                        (<span class="js-var">id</span>) =&gt; <span class="js-func">console</span>.<span class="js-func">log</span>(<span class="js-string">'deleted'</span>, <span class="js-var">id</span>)
+                        );
+                    </div>
+                </div>
+                <br/><br/>
+
+                <div class="data-sources-media">
+                    <!-- ========== Hydration from HTML ========== -->
+                    <h3>Building from HTML</h3>
+                    <p>
+                        <code>Navigator.from(container, { max_tab_number, max_tab_message, delete_event })</code><br>
+                        Build tabs from static markup. Each <em>[data-tab-id]</em> yields one tab; put its content inside
+                        <em>.navigator-tab-content</em>. Tabs with <em>data-hidden="true"</em> won’t get a button.
+                    </p>
+                    <div class="block-html">
+                    &lt;div class="navigator" id="prebuilt"&gt;
+                    &nbsp;&nbsp;&lt;div class="navigator-bar"&gt;&lt;/div&gt;
+                    &nbsp;&nbsp;&lt;div class="navigator-content"&gt;&lt;/div&gt;
+                    &nbsp;&nbsp;&lt;section data-tab-id="home" data-tab-name="Home" data-closable="false"&gt;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="navigator-tab-content"&gt;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;h4&gt;Home&lt;/h4&gt;&lt;p&gt;Static markup.&lt;/p&gt;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+                    &nbsp;&nbsp;&lt;/section&gt;
+                    &nbsp;&nbsp;&lt;section data-tab-id="reports" data-tab-name="Reports" data-hidden="true"&gt;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="navigator-tab-content"&gt;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;h4&gt;Reports&lt;/h4&gt;&lt;p&gt;Hidden by default.&lt;/p&gt;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+                    &nbsp;&nbsp;&lt;/section&gt;
+                    &lt;/div&gt;
+                    </div>
+                    <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">navFrom</span> =
+                        <span class="js-class">Navigator</span>.<span class="js-func">from</span>( <span class="js-class">document</span>.<span class="js-func">getElementById</span>(<span class="js-string">'prebuilt'</span>), {
+                        max_tab_number:<span class="js-number">10</span>,
+                        max_tab_message:<span class="js-string">'Limit'</span>,
+                        delete_event:(<span class="js-var">id</span>) =&gt; {}
+                        });
+                        <br><span class="js-var">navFrom</span>.<span class="js-func">open</span>(<span class="js-string">'home'</span>);
+                    </div>
+
+                    <!-- ========== Printing ========== -->
+                    <h3>Printing</h3>
+                    <p>
+                        <code>print_tabs(tab_ids, { filename })</code> builds a printable bundle:
+                        it reveals hidden <em>display:none</em> fragments, snapshots <em>&lt;canvas&gt;</em> to images,
+                        attaches it to the document, sets <em>document.title</em> if given, and calls <em>window.print()</em>.
+                    </p>
+                    <div class="block-js">
+                        <span class="js-var">nav</span>.<span class="js-func">print_tabs</span>( <span class="js-var">nav</span>.<span class="js-func">ids</span>() , { filename:<span class="js-string">'Monthly Report'</span> });
+                    </div>
+                </div>
+                <br/><br/>
+
+                <div id="note">
+                    <!-- ========== Notes & Tips ========== -->
+                    <h3>Notes &amp; Tips</h3>
+                    <ul>
+                        <li><strong>Limits:</strong> if <em>max_tab_number</em> is reached and <em>max_tab_message</em> is set, the new tab is ignored and a warning is surfaced via <code>toast("warning", ...)</code> if available.</li>
+                        <li><strong>Hidden tabs:</strong> use <code>ids({ include_hidden: true })</code> to audit all tab ids; visible ids only by default.</li>
+                        <li><strong>Data access:</strong> the internal map <em>nav.tabs</em> stores <code>{ label, button, content, hidden, count_towards_limit }</code> per id; <em>nav.current</em> holds the current tab id.</li>
+                    </ul>
+                </div>
+
             </div>
             </section>
 
@@ -788,23 +1107,6 @@
     });
     edMount.innerHTML = `${ed}`;
 
-    // --- Navigator demo ---
-    // const navMount = document.getElementById("navigator-mount");
-    // const nav = new Navigator();
-    // nav.draw(navMount);
-    // nav.add("intro", "Intro", "<p>Bienvenue dans Navigator</p>", { closable:false });
-    // nav.add("ex1", "Exemple 1", "<p>Contenu 1</p>", { closable:true });
-    // nav.add("ex2", "Exemple 2", "<p>Contenu 2</p>", { closable:true });
-
-    // document.getElementById("nav-add-tab").addEventListener("click", () => {
-    //   const id = "t" + Math.random().toString(36).slice(2,7);
-    //   nav.add(id, "Tab " + id, `<p>Tab ${id}</p>`, { closable:true });
-    //   nav.open(id);
-    // });
-    // document.getElementById("nav-del-tab").addEventListener("click", () => {
-    //   if (nav.current) nav.delete(nav.current);
-    // });
-
     // --- PopUp demo ---
     const $ = (id) => document.getElementById(id);
 
@@ -879,6 +1181,265 @@
         ]);
         pop.set_content('<h4>Runtime actions</h4><p>Buttons replaced.</p>');
         }, 1200);
+    });
+
+    // --- LoadingScreen demo ---
+    let intervalId=null; let pct=0;
+
+    $('ls-show').addEventListener('click', ()=>{
+        LoadingScreen.show();
+        LoadingScreen.update({
+        main_steps: [],
+        detail: { status: 'idle' }
+        });
+    });
+
+    $('ls-seed').addEventListener('click', ()=>{
+        LoadingScreen.show();
+        LoadingScreen.update({
+        main_steps: [
+            { title:'Load dataset', progress: .15, info:'12/80' },
+            { title:'Build index',  progress: 0   }
+        ],
+        detail: { file:'data.csv', splits:2 }
+        });
+    });
+
+    $('ls-progress').addEventListener('click', ()=>{
+        LoadingScreen.show();
+        pct=0;
+        clearInterval(intervalId);
+        intervalId=setInterval(()=>{
+        pct=Math.min(1, pct+0.08);
+        LoadingScreen.update({
+            main_steps:[
+            { title:'Load dataset', progress:pct, info:`${Math.round(pct*80)}/80` },
+            { title:'Build index',  progress: Math.max(0, pct-0.4) }
+            ],
+            detail:{ status: pct<1?'loading':'done' }
+        });
+        if(pct>=1){ clearInterval(intervalId); }
+        }, 350);
+    });
+
+    $('ls-add-step').addEventListener('click', ()=>{
+        LoadingScreen.show();
+        LoadingScreen.update({
+        main_steps:[
+            { title:'Load dataset', progress:.6, info:'48/80' },
+            { title:'Build index',  progress:.25 },
+            { title:'Warmup cache', progress:0 }
+        ],
+        detail:{ node:'A1', host: location.hostname }
+        });
+    });
+
+    $('ls-reset').addEventListener('click', ()=>{
+        LoadingScreen.show();
+        LoadingScreen.update({ main_steps:[], detail:{} });
+        clearInterval(intervalId); pct=0;
+    });
+
+    const demoCloseBtn = $('ls-demo-close');
+
+    demoCloseBtn.addEventListener('click', () => {
+        LoadingScreen.hide();
+        demoCloseBtn.style.display = 'none';
+    });
+
+    // Hook show/hide
+    const origShow = LoadingScreen.show.bind(LoadingScreen);
+        LoadingScreen.show = function() {
+        origShow();
+        demoCloseBtn.style.display = 'block';
+        console.log("LoadingScreen shown, demoCloseBtn visible");
+    };
+
+    const origHide = LoadingScreen.hide.bind(LoadingScreen);
+        LoadingScreen.hide = function() {
+        origHide();
+        demoCloseBtn.style.display = 'none';
+    };
+
+    let nav = null
+    const ui = {
+        start:  $('nav-start'),
+        action: $('nav-action'),
+        run:    $('nav-run'),
+        mount:  $('nav-mount'),
+    };
+
+    // Lorem generator (simple)
+    const lipsum = () =>
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere, ' +
+        'nibh at viverra pulvinar, neque sapien faucibus mauris, eu accumsan nunc ' +
+        'massa in elit. Sed non laoreet arcu.';
+
+    // Met à jour le contenu de la tab "home" avec la liste des tabs
+    function renderHomeList() {
+        if (!nav) return;
+        const allIds = nav.ids({ include_hidden: true });
+        const visibleIds = new Set(nav.ids()); // visibles
+        const items = allIds.map(id => {
+        const t = nav.tabs.get(id);
+        const isHidden = !visibleIds.has(id);
+        const badge = isHidden ? '<span class="pill">hidden</span>' : '<span class="pill">visible</span>';
+        const current = (id === nav.current) ? ' <em>(current)</em>' : '';
+        const label = t?.label ?? id;
+        return `<li><strong>${label}</strong> <small>#${id}</small> ${badge}${current}</li>`;
+        }).join('');
+
+        const html =
+        `<h4>Home</h4>
+        <p>This is the landing tab. It lists all tabs (including hidden ones).</p>
+        <ul class="home-tab-list">${items}</ul>`;
+
+        // Si la tab home existe, remplace son contenu, sinon rien
+        const home = nav.tabs.get('home');
+        if (home) nav.set('home', html);
+    }
+
+    // Tri A→Z (home en premier), uniquement les tabs visibles (ordre visuel)
+    function sortVisibleTabsAZ() {
+        if (!nav) return;
+        const ids = nav.ids(); // visibles
+        const withLabels = ids.map(id => ({ id, label: nav.tabs.get(id)?.label ?? id }));
+        withLabels.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
+
+        // Place "home" en premier si présent
+        const homeIdx = withLabels.findIndex(x => x.id === 'home');
+        if (homeIdx > 0) {
+        const [homeItem] = withLabels.splice(homeIdx, 1);
+        withLabels.unshift(homeItem);
+        }
+
+        nav.order(withLabels.map(x => x.id));
+    }
+
+    // Hook utilitaire pour rafraîchir la liste "home" après chaque action
+    function hookRefreshers() {
+        if (!nav) return;
+        // Wrap open to refresh "current" indicator
+        const origOpen = nav.open.bind(nav);
+        nav.open = function(id) {
+        origOpen(id);
+        renderHomeList();
+        };
+        // Wrap delete to refresh
+        const origDelete = nav.delete.bind(nav);
+        nav.delete = function(id) {
+        // Protection: ne jamais supprimer home
+        if (id === 'home') {
+            if (window.Toast) Toast.warning('Cannot delete "home"');
+            else alert('Cannot delete "home"');
+            return;
+        }
+        origDelete(id);
+        renderHomeList();
+        };
+        // Wrap add/add_hidden/set/order to refresh list
+        const origAdd = nav.add.bind(nav);
+        nav.add = function(tab_id, tab_name, content, opts) {
+        origAdd(tab_id, tab_name, content, opts);
+        renderHomeList();
+        };
+        const origAddHidden = nav.add_hidden.bind(nav);
+        nav.add_hidden = function(tab_id, tab_name, content, opts) {
+        origAddHidden(tab_id, tab_name, content, opts);
+        renderHomeList();
+        };
+        const origSet = nav.set.bind(nav);
+        nav.set = function(tab_id, new_content) {
+        origSet(tab_id, new_content);
+        if (tab_id === 'home') return; // éviter boucle
+        renderHomeList();
+        };
+        const origOrder = nav.order.bind(nav);
+        nav.order = function(list) {
+        origOrder(list);
+        renderHomeList();
+        };
+    }
+
+    // ----- UI wiring -----
+    ui.start.addEventListener('click', () => {
+        ui.mount.innerHTML = '';
+        // Pas de "stats" au seed
+        nav = new Navigator(8, 'Tab limit reached');
+        nav.draw('#nav-mount');
+
+        // Seed: home (non closable), logs (closable)
+        nav.add('home', 'Home',
+        `<h4>Home</h4>
+        <p>Welcome. This tab lists all tabs below.</p>
+        <ul class="home-tab-list"></ul>`,
+        { closable: false }
+        );
+        nav.add('logs', 'Logs',
+        `<h4>Logs</h4><p>${lipsum()}</p>`,
+        { closable: true }
+        );
+
+        hookRefreshers();
+        renderHomeList();
+
+        // Enable controls
+        ui.action.disabled = false;
+        ui.run.disabled = false;
+        ui.start.disabled = true;
+    });
+
+    ui.run.addEventListener('click', () => {
+        if (!nav) return;
+        const action = ui.action.value;
+
+        switch (action) {
+        case 'add': {
+            const id = 'tab-' + Math.random().toString(36).slice(2,6);
+            nav.add(id, id.toUpperCase(),
+            `<h4>${id.toUpperCase()}</h4><p>${lipsum()}</p>`,
+            { closable: false }
+            );
+            nav.open(id);
+            break;
+        }
+        case 'add-closable': {
+            const id = 'tab-' + Math.random().toString(36).slice(2,6);
+            nav.add(id, id.toUpperCase(),
+            `<h4>${id.toUpperCase()}</h4><p>${lipsum()}</p>`,
+            { closable: true }
+            );
+            nav.open(id);
+            break;
+        }
+        case 'open-hidden': {
+            if (!nav.ids({ include_hidden:true }).includes('reports')) {
+            nav.add_hidden('reports', 'Reports (hidden)',
+                `<h4>Reports</h4><p>${lipsum()}</p>`);
+            }
+            nav.open('reports');
+            break;
+        }
+        case 'delete': {
+            if (!nav.current) return;
+            // Protection déjà dans nav.delete hook, mais on redouble ici
+            if (nav.current === 'home') {
+            if (window.Toast) Toast.warning('Cannot delete "home"');
+            else alert('Cannot delete "home"');
+            return;
+            }
+            nav.delete(nav.current);
+            break;
+        }
+        case 'sort': {
+            sortVisibleTabsAZ();
+            break;
+        }
+        case 'print': {
+            nav.print_tabs(nav.ids());
+            break;
+        }
+        }
     });
 </script>
 

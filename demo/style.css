@@ -194,6 +194,35 @@ button.next-button {
     position: relative;
 }
 
+#ls-demo-close {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 30000; /* au-dessus du loading */
+  display: none;
+  background: #d77777;
+  border: solid 2px #670202;
+  color: #670202;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  transition: background .2s;
+}
+#ls-demo-close:hover {
+  background: #c26060;
+}
+
+.navigator-content, .navigator-bar > button {
+    background: var(--bg);
+}
+
+.navigator-bar > button.active {
+    border-bottom-color: var(--accent);
+    color: var(--accent);
+    background: var(--bg);
+}
+
 .block-js::before {
     content: 'JS';
     background: #EFD81A;
@@ -308,4 +337,31 @@ tbody td {
     border-radius: 4px;
     top: 4px;
     left: 4px;
+}
+
+@media print {
+    body { background: #fff; color: #000; }
+    header, nav { display: none; }
+    main { grid-template-columns: 1fr !important; }
+    section { display: block !important; }
+    .card { border-color: #000; }
+    .block-js, .block-css, .block-html { border-color: #000; }
+    .block-js::before, .block-css::before, .block-html::before { border-color: #000; }
+    a { color: #000; text-decoration: underline; }
+
+    .navigator-bar > button.active {
+        border-bottom-color: var(--accent);
+        color: var(--accent);
+        background: #fff;
+    }
+
+    .navigator-bar > button {
+        background: #fff;
+        color: #000;
+    }
+
+    .navigator-content {
+        background: #fff;
+        color: #000;
+    }
 }

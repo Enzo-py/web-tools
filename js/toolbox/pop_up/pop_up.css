@@ -1,6 +1,6 @@
 /* PopUp – styles unifiés, sans blur */
 .pop-up-wrapper{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999}
-.pop-up-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.pop-up-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45)}
 .showcase-background{position:absolute;inset:0;pointer-events:none;outline:9999px solid rgba(0,0,0,.35)}
 
 .pop-up{
