@@ -1,4 +1,5 @@
+import cssText from './context_menu.css';
 import { ensure_stylesheet } from '../shared/ensure_stylesheet.js';
-ensure_stylesheet(new URL('./context_menu.css', import.meta.url));
+ensure_stylesheet(cssText, "webtool__context_menu_css");
 
 export * from './context_menu.js'

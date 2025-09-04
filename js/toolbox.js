@@ -246,78 +246,99 @@ function formatAllSelectBlocks(sql) {
 }
 
 function ensure_loading_screen() {
-    if (!d3.select("#loading-screen").node()) {
-        const loading_screen = d3.select("body")
-            .append("div")
-            .attr("id", "loading-screen");
+    if (!document.getElementById("loading-screen")) {
+        const loading_screen = document.createElement("div");
+        loading_screen.id = "loading-screen";
 
-        loading_screen.append("div").attr("class", "spinner");
-        loading_screen.append("div").attr("id", "loading-steps");
-        loading_screen.append("div").attr("id", "loading-detail");
+        const spinner = document.createElement("div");
+        spinner.className = "spinner";
+        loading_screen.appendChild(spinner);
+
+        const steps = document.createElement("div");
+        steps.id = "loading-steps";
+        loading_screen.appendChild(steps);
+
+        const detail = document.createElement("div");
+        detail.id = "loading-detail";
+        loading_screen.appendChild(detail);
+
+        document.body.appendChild(loading_screen);
     }
 }
 
 function show_loading_screen() {
     ensure_loading_screen();
-    d3.select("#loading-screen").classed("active", true);
+    document.getElementById("loading-screen")?.classList.add("active");
 }
+
 
 function hide_loading_screen() {
     ensure_loading_screen();
-    d3.select("#loading-screen").classed("active", false);
+    document.getElementById("loading-screen")?.classList.remove("active");
 }
 
 function update_loading_screen(content) {
     const steps = content.main_steps || [];
     const detail = content.detail || {};
 
-    const container = d3.select("#loading-steps");
-    const detailContainer = d3.select("#loading-detail");
+    const container = document.getElementById("loading-steps");
+    const detailContainer = document.getElementById("loading-detail");
 
-    // Data join for steps
-    const stepSelection = container.selectAll(".loading-step")
-        .data(steps, d => d.title);
+    if (!container || !detailContainer) return;
 
-    // EXIT old steps
-    stepSelection.exit().remove();
+    // --- Steps ---
+    const existing = Array.from(container.querySelectorAll(".loading-step"));
 
-    // ENTER new steps
-    const stepEnter = stepSelection.enter()
-        .append("div")
-        .attr("class", "loading-step");
+    // Map existants par titre
+    const existingMap = new Map(existing.map(el => [
+        el.querySelector(".loading-step-title")?.textContent, 
+        el
+    ]));
 
-    stepEnter.append("div")
-        .attr("class", "loading-step-title");
+    // Supprime ceux qui ne sont plus dans la nouvelle liste
+    existing.forEach(el => {
+        const title = el.querySelector(".loading-step-title")?.textContent;
+        if (!steps.find(s => s.title === title)) {
+            container.removeChild(el);
+        }
+    });
 
-    stepEnter.append("progress")
-        .attr("class", "loading-step-progress")
-        .attr("max", 1);
+    // Ajoute ou met à jour
+    steps.forEach(step => {
+        let stepEl = existingMap.get(step.title);
 
-    stepEnter.append("div")
-        .attr("class", "loading-step-info");
+        if (!stepEl) {
+            stepEl = document.createElement("div");
+            stepEl.className = "loading-step";
 
-    // MERGE enter + update
-    const stepMerge = stepEnter.merge(stepSelection);
+            const titleEl = document.createElement("div");
+            titleEl.className = "loading-step-title";
+            stepEl.appendChild(titleEl);
 
-    // Update each step's content
-    stepMerge.select(".loading-step-title")
-        .text(d => d.title);
+            const progressEl = document.createElement("progress");
+            progressEl.className = "loading-step-progress";
+            progressEl.max = 1;
+            stepEl.appendChild(progressEl);
 
-    stepMerge.select(".loading-step-progress")
-        .attr("value", d => d.progress || 0);
+            const infoEl = document.createElement("div");
+            infoEl.className = "loading-step-info";
+            stepEl.appendChild(infoEl);
 
-    // Only show info for the step that has non-empty info
-    // We assume only one step has non-empty info per your backend design
-    stepMerge.select(".loading-step-info")
-        .text(d => d.info || "");
+            container.appendChild(stepEl);
+        }
 
-    // Update detail container — show all keys/values nicely
-    detailContainer.html(""); // clear
+        stepEl.querySelector(".loading-step-title").textContent = step.title;
+        stepEl.querySelector(".loading-step-progress").value = step.progress || 0;
+        stepEl.querySelector(".loading-step-info").textContent = step.info || "";
+    });
 
+    // --- Detail ---
+    detailContainer.innerHTML = "";
     Object.entries(detail).forEach(([key, val]) => {
-        detailContainer.append("div")
-            .attr("class", "loading-detail-item")
-            .text(`${key}: ${val}`);
+        const div = document.createElement("div");
+        div.className = "loading-detail-item";
+        div.textContent = `${key}: ${val}`;
+        detailContainer.appendChild(div);
     });
 }
 

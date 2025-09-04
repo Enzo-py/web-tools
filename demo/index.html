@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>WebTools</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="../public/toolbox.bundle.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&" as="style" onload="this.onload=null;this.rel='stylesheet'">
+</head>
+<body>
+    <header>
+    <h1>WebTools — Documentation & Mini demo</h1>
+    <div class="spacer"></div>
+    <label><input id="focus-toggle" type="checkbox" /> Mode focus</label>
+    <select id="focus-select" aria-label="Choisir l'objet">
+        <option value="ContextMenu">ContextMenu</option>
+        <option value="DataTable">DataTable</option>
+        <option value="EditableText">EditableText</option>
+        <option value="Navigator">Navigator</option>
+        <option value="PopUp">PopUp</option>
+    </select>
+    </header>
+
+    <main>
+        <nav id="nav">
+            <a href="#ContextMenu" class="item">ContextMenu</a>
+            <a href="#DataTable" class="item">DataTable</a>
+            <a href="#EditableText" class="item">EditableText</a>
+            <a href="#Navigator" class="item">Navigator</a>
+            <a href="#PopUp" class="item">PopUp</a>
+        </nav>
+
+        <div id="content">
+            <!-- ContextMenu -->
+            <section id="ContextMenu" class="active">
+            <div class="card">
+                <h2>ContextMenu</h2>
+                <p class="muted">Clic droit dans la zone ci-dessous.</p>
+                <div id="cm-area" class="card" style="height:160px; display:flex; align-items:center; justify-content:center;">
+                Zone contextuelle
+                </div>
+            </div>
+            </section>
+
+            <!-- DataTable -->
+            <section id="DataTable">
+            <div class="card">
+                <h2>DataTable</h2>
+                <div id="datatable-mount"></div>
+                <div class="row">
+                <button id="dt-reload">Recharger</button>
+                <span class="muted">Exemple minimal avec données mock.</span>
+                </div>
+            </div>
+            </section>
+
+            <!-- EditableText -->
+            <section id="EditableText">
+            <div class="card">
+                <h2>EditableText</h2>
+                <div id="editable-mount"></div>
+                <p class="muted">Double-clic pour éditer. Enter pour valider, Esc pour annuler.</p>
+            </div>
+            </section>
+
+            <!-- Navigator -->
+            <section id="Navigator">
+            <div class="card">
+                <h2>Navigator</h2>
+                <div id="navigator-mount" class="card"></div>
+                <div class="row">
+                <button id="nav-add-tab">Ajouter un onglet</button>
+                <button id="nav-del-tab">Supprimer l'onglet courant</button>
+                </div>
+            </div>
+            </section>
+
+            <!-- PopUp -->
+            <section id="PopUp">
+            <div class="card">
+                <h2>PopUp</h2>
+                <div class="row">
+                <button id="popup-info">Info</button>
+                <button id="popup-error">Erreur</button>
+                </div>
+            </div>
+            </section>
+        </div>
+    </main>
+</body>
+
+<script>
+    const { PopUp, Navigator, ContextMenu, EditableText, DataTable } = Toolbox;
+
+    // routing interne + focus
+    const sections = Array.from(document.querySelectorAll("section"));
+    const navItems = Array.from(document.querySelectorAll("#nav .item"));
+    const focusToggle = document.getElementById("focus-toggle");
+    const focusSelect = document.getElementById("focus-select");
+
+    function show(id) {
+      sections.forEach(s => s.classList.toggle("active", s.id === id));
+      navItems.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + id));
+      if (focusToggle.checked) applyFocus(id);
+      history.replaceState(null, "", "#" + id);
+    }
+    function applyFocus(id) {
+      sections.forEach(s => s.style.display = (s.id === id ? "" : "none"));
+    }
+    function clearFocus() {
+      sections.forEach(s => s.style.display = "");
+    }
+
+    // nav
+    window.addEventListener("hashchange", () => {
+      const id = location.hash.slice(1) || "ContextMenu";
+      show(id);
+      focusSelect.value = id;
+    });
+    navItems.forEach(a => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = a.getAttribute("href").slice(1);
+      show(id);
+      focusSelect.value = id;
+    }));
+    focusToggle.addEventListener("change", () => {
+      const id = document.querySelector("section.active")?.id || "ContextMenu";
+      focusToggle.checked ? applyFocus(id) : clearFocus();
+    });
+    focusSelect.addEventListener("change", () => show(focusSelect.value));
+
+    // init route
+    show(location.hash.slice(1) || "ContextMenu");
+    focusSelect.value = location.hash.slice(1) || "ContextMenu";
+
+    // --- ContextMenu demo ---
+    const context_menu_demo = new ContextMenu({
+        activation: 'contextmenu',
+        mode: 'selector',
+        selector: '#cm-area',
+
+        // Enrich the callback context with useful data
+        context_fn: (event, element) => ({ 
+            id: element.dataset.id, 
+            name: element.dataset.name 
+        })
+    });
+    context_menu_demo
+        .action('Cut', () => document.execCommand('cut'))
+        .action('Copy', () => document.execCommand('copy'))
+        .action('Paste', () => document.execCommand('paste'))
+        .sep()
+        .action('Select All', () => document.execCommand('selectAll'));
+
+    // --- DataTable demo ---
+    // const dtMount = document.getElementById("datatable-mount");
+    // const rows = [
+    //   { id: 1, name: "Alpha", value: 42 },
+    //   { id: 2, name: "Beta", value: 7 },
+    //   { id: 3, name: "Gamma", value: 13 },
+    // ];
+    // const dt = new DataTable({
+    //   columns: [
+    //     { key: "id", header: "ID" },
+    //     { key: "name", header: "Name" },
+    //     { key: "value", header: "Value" },
+    //   ],
+    //   data: rows
+    // });
+    // dtMount.appendChild(dt.el);
+    // document.getElementById("dt-reload").addEventListener("click", () => {
+    //   dt.setData(rows.map(r => ({ ...r, value: Math.floor(Math.random()*100) })));
+    // });
+
+    // --- EditableText demo ---
+    // const edMount = document.getElementById("editable-mount");
+    // const ed = new EditableText({ value: "Double-clic pour éditer" });
+    // ed.onChange = (val) => console.log("EditableText:", val);
+    // edMount.appendChild(ed.el);
+
+    // --- Navigator demo ---
+    // const navMount = document.getElementById("navigator-mount");
+    // const nav = new Navigator();
+    // nav.draw(navMount);
+    // nav.add("intro", "Intro", "<p>Bienvenue dans Navigator</p>", { closable:false });
+    // nav.add("ex1", "Exemple 1", "<p>Contenu 1</p>", { closable:true });
+    // nav.add("ex2", "Exemple 2", "<p>Contenu 2</p>", { closable:true });
+
+    // document.getElementById("nav-add-tab").addEventListener("click", () => {
+    //   const id = "t" + Math.random().toString(36).slice(2,7);
+    //   nav.add(id, "Tab " + id, `<p>Tab ${id}</p>`, { closable:true });
+    //   nav.open(id);
+    // });
+    // document.getElementById("nav-del-tab").addEventListener("click", () => {
+    //   if (nav.current) nav.delete(nav.current);
+    // });
+
+    // --- PopUp demo ---
+    // document.getElementById("popup-info").addEventListener("click", () => {
+    //   PopUp.info("Hello", "Ceci est un message d'information.");
+    // });
+    // document.getElementById("popup-error").addEventListener("click", () => {
+    //   PopUp.error("Oups", "Une erreur est survenue.");
+    // });
+</script>
+
+</html>

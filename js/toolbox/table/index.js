@@ -1,5 +1,6 @@
+import cssText from './table.css'; 
 import { ensure_stylesheet } from '../shared/ensure_stylesheet.js';
-ensure_stylesheet(new URL('./table.css', import.meta.url));
+ensure_stylesheet(cssText, 'webtool__table_css');
 
 import { DataTableBase } from './mixins/base.js';
 import { with_plugins } from './mixins/plugins.js';
