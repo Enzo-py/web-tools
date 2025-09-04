@@ -32,7 +32,25 @@
 
 .pop-up button:focus-visible{ outline: 1px solid #94a3b8; outline-offset: 1px }
 
-/* Hooks optionnels */
-/* .pop-up .yes-button{}
-.pop-up .no-button{}
-.pop-up .next-button{} */
+
+button.yes-button {
+    background-color: #e0f7e9;
+    border: solid 1px #34c759;
+    color: #34c759;
+    border-radius: 4px;
+}
+
+button.no-button {
+    background-color: #fbe2e0;
+    border: solid 1px #d4342b;
+    color: #d4342b;
+    border-radius: 4px;
+}
+
+button.next-button {
+    background-color: #d8f2fd;
+    border: solid 1px #7a9bb0;
+    color: #7a9bb0;
+    border-radius: 4px;
+}
+

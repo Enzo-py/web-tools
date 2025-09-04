@@ -13,15 +13,6 @@
 <body>
     <header>
     <h1>WebTools — Documentation & Mini demo</h1>
-    <div class="spacer"></div>
-    <label><input id="focus-toggle" type="checkbox" /> Mode focus</label>
-    <select id="focus-select" aria-label="Choisir l'objet">
-        <option value="ContextMenu">ContextMenu</option>
-        <option value="DataTable">DataTable</option>
-        <option value="EditableText">EditableText</option>
-        <option value="Navigator">Navigator</option>
-        <option value="PopUp">PopUp</option>
-    </select>
     </header>
 
     <main>
@@ -29,8 +20,10 @@
             <a href="#ContextMenu" class="item">ContextMenu</a>
             <a href="#DataTable" class="item">DataTable</a>
             <a href="#EditableText" class="item">EditableText</a>
+            <a href="#LoadingScreen" class="item">LoadingScreen</a>
             <a href="#Navigator" class="item">Navigator</a>
             <a href="#PopUp" class="item">PopUp</a>
+            <a href="#Toast" class="item">Toast</a>
         </nav>
 
         <div id="content">
@@ -38,10 +31,319 @@
             <section id="ContextMenu" class="active">
             <div class="card">
                 <h2>ContextMenu</h2>
-                <p class="muted">Clic droit dans la zone ci-dessous.</p>
-                <div id="cm-area" class="card" style="height:160px; display:flex; align-items:center; justify-content:center;">
-                Zone contextuelle
+
+                <div id="context-menu-demo">
+                    <p class="muted">Right click in the following zone.</p>
+                    <div id="cm-area" class="card" style="height:160px; display:flex; align-items:center; justify-content:center; border-color: var(--accent);">
+                        Contextual zone
+                    </div>
+                    <br/>
+                    <br/>
+
+                    <h3>JS used for this exemple</h3>
+                    <div class="block-js">
+                        <span class="js-const">const</span> context_menu_demo = <span class="js-keyword">new</span> <span class="js-object">ContextMenu</span>({
+                        <br>&nbsp;&nbsp;activation: <span class="js-string">'contextmenu'</span>,
+                        <br>&nbsp;&nbsp;mode: <span class="js-string">'selector'</span>,
+                        <br>&nbsp;&nbsp;selector: <span class="js-string">'#cm-area'</span>,
+                        <br>
+                        <br>&nbsp;&nbsp;<span class="js-comment">// Enrich the callback context with useful data</span>
+                        <br>&nbsp;&nbsp;context_fn: (event, element) =&gt; ({ 
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;id: element.id, 
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;name: element.name 
+                        <br>&nbsp;&nbsp;})
+                        <br>});
+                        <br><br>
+                        context_menu_demo
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Cut'</span>, () =&gt; document.execCommand(<span class="js-string">'cut'</span>))
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Copy'</span>, () =&gt; document.execCommand(<span class="js-string">'copy'</span>))
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Paste'</span>, () =&gt; document.execCommand(<span class="js-string">'paste'</span>))
+                        <br>&nbsp;&nbsp;.<span class="js-func">sep</span>()
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Select All'</span>, () =&gt; document.execCommand(<span class="js-string">'selectAll'</span>));
+                    </div>
                 </div>
+
+                <hr style="border-color: var(--darker-text);"/>
+
+                <div id="context-menu-instantiation">
+                    <h3>Instantiation</h3>
+
+                    <h4>Open on right-click anywhere in the page</h4>
+                    <div class="block-js">
+                        <span class="js-const">const</span> menu = <span class="js-keyword">new</span> <span class="js-class">ContextMenu</span>({
+                        <br>&nbsp;&nbsp;activation: <span class="js-string">'contextmenu'</span>,
+                        <br>&nbsp;&nbsp;mode: <span class="js-string">'always'</span>
+                        <br>});
+                    </div>
+
+                    <p>
+                        The menu opens for <strong>any activation event</strong> inside the container
+                        (default: <code>document</code>).
+                    </p>
+                    <ul>
+                        <li><code>ctx.target</code> is the original event target</li>
+                        <li>Useful for global context menus</li>
+                    </ul>
+
+                    <br/>
+
+                    <h4>Open only when right-clicking specific elements</h4>
+                    <div class="block-js">
+                        <span class="js-const">const</span> menu = <span class="js-keyword">new</span> <span class="js-class">ContextMenu</span>({
+                        <br>&nbsp;&nbsp;activation: <span class="js-string">'contextmenu'</span>,
+                        <br>&nbsp;&nbsp;mode: <span class="js-string">'selector'</span>,
+                        <br>&nbsp;&nbsp;selector: <span class="js-string">'[data-menu="context-menu"]'</span>,
+                        <br>});
+                    </div>
+
+                    <p>
+                        The menu opens <strong>only if</strong>
+                        <code>event.target.closest(selector)</code> returns an element.
+                    </p>
+                    <ul>
+                        <li><code>ctx.target</code> is the matched element (not just the child you clicked)</li>
+                        <li>
+                        Use <code>context_fn(event, matchedElement)</code> to pass
+                        domain-specific data
+                        </li>
+                        <li>Perfect for item-specific menus</li>
+                    </ul>
+                </div>
+
+                <div id="fluent-api">
+                    <h3>Fluent API</h3>
+                    <div class="block-js">
+                        <span class="js-var js-var-def">fileMenu</span>
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Open'</span>, ({data}) =&gt; <span class="js-func">openFile</span>(data.id))
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Rename'</span>, ({data}) =&gt; <span class="js-func">renameFile</span>(data.id))
+                        <br>&nbsp;&nbsp;.<span class="js-func">sep</span>()
+                        <br>&nbsp;&nbsp;.<span class="js-func">check</span>(<span class="js-string">'Pinned'</span>,
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;({data}) =&gt; <span class="js-func">isPinned</span>(data.id),&nbsp;&nbsp;<span class="js-comment">// Initial state</span>
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;(checked, {data}) =&gt; <span class="js-func">setPinned</span>(data.id, checked)&nbsp;&nbsp;<span class="js-comment">// Toggle handler</span>
+                        <br>);
+                    </div>
+                    </div>
+
+                    <div id="action-options">
+                    <h3>Action Options</h3>
+                    <div class="block-js">
+                        <span class="js-var">fileMenu</span>.<span class="js-func">action</span>(<span class="js-string">'Delete'</span>, ({data}) =&gt; <span class="js-func">deleteFile</span>(data.id), {
+                        <br>&nbsp;&nbsp;visible: ({data}) =&gt; data.type !== <span class="js-string">'folder'</span>,&nbsp;&nbsp;<span class="js-comment">// Hide item if false</span>
+                        <br>&nbsp;&nbsp;enabled: ({data}) =&gt; !<span class="js-func">isProtected</span>(data.id),&nbsp;&nbsp;<span class="js-comment">// Disable if false</span>
+                        <br>&nbsp;&nbsp;icon_html: <span class="js-string">'🗑️'</span>,&nbsp;&nbsp;<span class="js-comment">// Optional icon HTML</span>
+                        <br>&nbsp;&nbsp;danger: <span class="js-keyword">true</span>&nbsp;&nbsp;<span class="js-comment">// Red-ish hover style</span>
+                        <br>});
+                    </div>
+                    </div>
+
+                    <div id="context-object">
+                    <h3>Context Object</h3>
+                    <p>Every handler receives a context object with:</p>
+                    <div class="block-js">
+                        {
+                        <br>&nbsp;&nbsp;<span class="js-var">event</span>,&nbsp;&nbsp;<span class="js-comment">// Original DOM event</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">target</span>,&nbsp;&nbsp;<span class="js-comment">// Matched element (selector mode) or event target (always mode)</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">data</span>,&nbsp;&nbsp;<span class="js-comment">// Shorthand for target.dataset</span>
+                        <br>&nbsp;&nbsp;...<span class="js-func">context_fn</span>()&nbsp;&nbsp;<span class="js-comment">// Any extra fields you injected via context_fn</span>
+                        <br>}
+                    </div>
+                    </div>
+
+                    <div id="advanced-usage">
+                    <h3>🎯 Advanced Usage</h3>
+
+                    <div id="manual-triggering">
+                        <h4>Manual Triggering</h4>
+                        <div class="block-js">
+                        <span class="js-comment">// Open at specific coordinates</span>
+                        <br><span class="js-var">button</span>.<span class="js-func">addEventListener</span>(<span class="js-string">'click'</span>, (e) =&gt; {
+                        <br>&nbsp;&nbsp;<span class="js-const">const</span> ctx = { <span class="js-var">from</span>: <span class="js-string">'button'</span>, <span class="js-var">id</span>: <span class="js-var">button</span>.<span class="js-var">dataset</span>.<span class="js-var">id</span> };
+                        <br>&nbsp;&nbsp;<span class="js-var">fileMenu</span>.<span class="js-func">open_at</span>(e.<span class="js-var">clientX</span>, e.<span class="js-var">clientY</span>, ctx);
+                        <br>});
+                        <br>
+                        <br><span class="js-comment">// Handle events directly</span>
+                        <br><span class="js-var">container</span>.<span class="js-func">addEventListener</span>(<span class="js-string">'contextmenu'</span>, (e) =&gt; {
+                        <br>&nbsp;&nbsp;<span class="js-var">fileMenu</span>.<span class="js-func">open_for_event</span>(e);
+                        <br>});
+                        </div>
+                    </div>
+
+                    <div id="mobile-long-press">
+                        <h4>Mobile Long-Press Support</h4>
+                        <div class="block-js">
+                        <span class="js-func">function</span> <span class="js-func">longPress</span>(element, callback, duration = <span class="js-number">500</span>) {
+                        <br>&nbsp;&nbsp;<span class="js-const">let</span> timeout = <span class="js-keyword">null</span>;
+                        <br>&nbsp;&nbsp;element.<span class="js-func">addEventListener</span>(<span class="js-string">'touchstart'</span>, (e) =&gt; {
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;timeout = <span class="js-func">setTimeout</span>(() =&gt; callback(e.<span class="js-var">touches</span>[<span class="js-number">0</span>]), duration);
+                        <br>&nbsp;&nbsp;}, { passive: <span class="js-keyword">true</span> });
+                        <br>&nbsp;&nbsp;[<span class="js-string">'touchend'</span>, <span class="js-string">'touchmove'</span>, <span class="js-string">'touchcancel'</span>].<span class="js-func">forEach</span>(eventType =&gt; {
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;element.<span class="js-func">addEventListener</span>(eventType, () =&gt; {
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="js-func">clearTimeout</span>(timeout);
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;}, { passive: <span class="js-keyword">true</span> });
+                        <br>&nbsp;&nbsp;});
+                        <br>}
+                        <br>
+                        <br><span class="js-comment">// Apply long-press to open context menu</span>
+                        <br><span class="js-func">longPress</span>(<span class="js-class">document</span>, (touch) =&gt; {
+                        <br>&nbsp;&nbsp;<span class="js-var">fileMenu</span>.<span class="js-func">open_at</span>(touch.<span class="js-var">clientX</span>, touch.<span class="js-var">clientY</span>, { <span class="js-var">from</span>: <span class="js-string">'touch'</span> });
+                        <br>});
+                        </div>
+                    </div>
+
+                    <div id="dynamic-menu-updates">
+                        <h4>Dynamic Menu Updates</h4>
+                        <div class="block-js">
+                        <span class="js-comment">// Replace all items</span>
+                        <br><span class="js-var">fileMenu</span>.<span class="js-func">set_items</span>([]);
+                        <br>
+                        <br><span class="js-comment">// Rebuild menu</span>
+                        <br><span class="js-var">fileMenu</span>
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Refresh'</span>, () =&gt; <span class="js-var">location</span>.<span class="js-func">reload</span>())
+                        <br>&nbsp;&nbsp;.<span class="js-func">sep</span>()
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'About'</span>, () =&gt; <span class="js-func">showAbout</span>());
+                        <br>
+                        <br><span class="js-comment">// Control visibility</span>
+                        <br><span class="js-var">fileMenu</span>.<span class="js-func">close</span>();&nbsp;&nbsp;&nbsp;&nbsp;<span class="js-comment">// Hide if open</span>
+                        <br><span class="js-var">fileMenu</span>.<span class="js-func">destroy</span>(); <span class="js-comment">// Remove DOM and event listeners</span>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div id="api-reference">
+                    <h3>📝 API Reference</h3>
+
+                    <div id="constructor-options">
+                        <h4>Constructor Options</h4>
+                        <div class="block-js">
+                        <span class="js-keyword">interface</span> <span class="js-class">ContextMenuOptions</span> {
+                        <br>&nbsp;&nbsp;<span class="js-var">activation</span>?: <span class="js-class">string</span> | <span class="js-class">string</span>[];&nbsp;&nbsp;<span class="js-comment">// 'contextmenu' | 'click' | etc.</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">mode</span>?: <span class="js-string">'always'</span> | <span class="js-string">'selector'</span>;&nbsp;&nbsp;<span class="js-comment">// Targeting mode</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">selector</span>?: <span class="js-class">string</span>;&nbsp;&nbsp;<span class="js-comment">// CSS selector (required for 'selector' mode)</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">container</span>?: <span class="js-class">Document</span> | <span class="js-class">HTMLElement</span>;&nbsp;&nbsp;<span class="js-comment">// Event container (default: document)</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">items</span>?: <span class="js-class">MenuItem</span>[];&nbsp;&nbsp;<span class="js-comment">// Initial menu items</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">context_fn</span>?: (event: <span class="js-class">Event</span>, target: <span class="js-class">Element</span> | <span class="js-keyword">null</span>) =&gt; <span class="js-class">object</span>;
+                        <br>}
+                        </div>
+                    </div>
+
+                    <div id="fluent-api-methods">
+                        <h4>Fluent API Methods</h4>
+                        <table>
+                        <thead>
+                            <tr><th>Method</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>action(label, onClick, options?)</code></td><td>Add an action item</td></tr>
+                            <tr><td><code>check(label, getChecked, onToggle, options?)</code></td><td>Add a checkbox item</td></tr>
+                            <tr><td><code>sep()</code></td><td>Add a separator</td></tr>
+                            <tr><td><code>set_items(items[])</code></td><td>Replace all menu items</td></tr>
+                            <tr><td><code>open_for_event(event)</code></td><td>Open menu for a specific event</td></tr>
+                            <tr><td><code>open_at(x, y, context?)</code></td><td>Open menu at coordinates</td></tr>
+                            <tr><td><code>close()</code></td><td>Close the menu if open</td></tr>
+                            <tr><td><code>destroy()</code></td><td>Remove menu and cleanup</td></tr>
+                        </tbody>
+                        </table>
+                    </div>
+
+                    <div id="item-options">
+                        <h4>Item Options</h4>
+                        <div class="block-js">
+                        <span class="js-keyword">interface</span> <span class="js-class">ItemOptions</span> {
+                        <br>&nbsp;&nbsp;<span class="js-var">visible</span>?: (context) =&gt; <span class="js-class">boolean</span>;&nbsp;&nbsp;<span class="js-comment">// Show/hide condition</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">enabled</span>?: (context) =&gt; <span class="js-class">boolean</span>;&nbsp;&nbsp;<span class="js-comment">// Enable/disable condition</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">icon_html</span>?: <span class="js-class">string</span>;&nbsp;&nbsp;<span class="js-comment">// HTML for icon (SVG, emoji, etc.)</span>
+                        <br>&nbsp;&nbsp;<span class="js-var">danger</span>?: <span class="js-class">boolean</span>;&nbsp;&nbsp;<span class="js-comment">// Apply danger styling</span>
+                        <br>}
+                        </div>
+                    </div>
+                    </div>
+
+                    <div id="styling">
+                    <h3>🎨 Styling</h3>
+                    <p>The context menu uses CSS classes that you can customize:</p>
+                    <div class="block-css">
+                    <span class="css-selector">.context-menu</span> {
+                    <span class="css-property">/* Menu container */</span>
+                    }
+                    <br><span class="css-selector">.context-menu-item</span> {
+                    <span class="css-property">/* Menu item */</span>
+                    }
+                    <br><span class="css-selector">.context-menu-item.danger</span> {
+                    <span class="css-property">/* Danger item styling */</span>
+                    }
+                    <br><span class="css-selector">.context-menu-item.disabled</span> {
+                    <span class="css-property">/* Disabled item styling */</span>
+                    }
+                    <br><span class="css-selector">.context-menu-separator</span> {
+                    <span class="css-property">/* Separator styling */</span>
+                    }
+                    </div>
+                    </div>
+
+                    <div id="examples">
+                    <h3>🌟 Examples</h3>
+
+                    <div id="example-file-manager">
+                        <h4>File Manager Context Menu</h4>
+                        <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">fileMenu</span> = <span class="js-keyword">new</span> <span class="js-class">ContextMenu</span>({
+                        <br>&nbsp;&nbsp;activation: <span class="js-string">'contextmenu'</span>,
+                        <br>&nbsp;&nbsp;mode: <span class="js-string">'selector'</span>,
+                        <br>&nbsp;&nbsp;selector: <span class="js-string">'.file-item'</span>,
+                        <br>&nbsp;&nbsp;context_fn: (e, el) =&gt; ({
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;id: el.dataset.fileId,
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;type: el.dataset.fileType,
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;name: el.dataset.fileName
+                        <br>&nbsp;&nbsp;})
+                        <br>});
+                        <br>
+                        <br><span class="js-var">fileMenu</span>
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Open'</span>, ({data}) =&gt; <span class="js-func">openFile</span>(data.id))
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Download'</span>, ({data}) =&gt; <span class="js-func">downloadFile</span>(data.id))
+                        <br>&nbsp;&nbsp;.<span class="js-func">sep</span>()
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Rename'</span>, ({data}) =&gt; <span class="js-func">renameFile</span>(data.id))
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Move'</span>, ({data}) =&gt; <span class="js-func">moveFile</span>(data.id))
+                        <br>&nbsp;&nbsp;.<span class="js-func">sep</span>()
+                        <br>&nbsp;&nbsp;.<span class="js-func">check</span>(<span class="js-string">'Starred'</span>,
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;({data}) =&gt; <span class="js-func">isStarred</span>(data.id),
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;(starred, {data}) =&gt; <span class="js-func">setStarred</span>(data.id, starred)
+                        <br>&nbsp;&nbsp;)
+                        <br>&nbsp;&nbsp;.<span class="js-func">sep</span>()
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Delete'</span>, ({data}) =&gt; <span class="js-func">deleteFile</span>(data.id), {
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;icon_html: <span class="js-string">'🗑️'</span>,
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;danger: <span class="js-keyword">true</span>,
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: ({data}) =&gt; data.type !== <span class="js-string">'system'</span>
+                        <br>&nbsp;&nbsp;});
+                        </div>
+                    </div>
+
+                    <div id="example-text-editor">
+                        <h4>Text Editor Context Menu</h4>
+                        <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">editorMenu</span> = <span class="js-keyword">new</span> <span class="js-class">ContextMenu</span>({
+                        <br>&nbsp;&nbsp;activation: <span class="js-string">'contextmenu'</span>,
+                        <br>&nbsp;&nbsp;mode: <span class="js-string">'always'</span>,
+                        <br>&nbsp;&nbsp;container: <span class="js-class">document</span>.<span class="js-func">querySelector</span>(<span class="js-string">'.editor'</span>)
+                        <br>});
+                        <br>
+                        <br><span class="js-var">editorMenu</span>
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Cut'</span>, () =&gt; <span class="js-class">document</span>.<span class="js-func">execCommand</span>(<span class="js-string">'cut'</span>), {
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: () =&gt; !<span class="js-class">document</span>.<span class="js-func">getSelection</span>().<span class="js-func">isCollapsed</span>
+                        <br>&nbsp;&nbsp;})
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Copy'</span>, () =&gt; <span class="js-class">document</span>.<span class="js-func">execCommand</span>(<span class="js-string">'copy'</span>), {
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;enabled: () =&gt; !<span class="js-class">document</span>.<span class="js-func">getSelection</span>().<span class="js-func">isCollapsed</span>
+                        <br>&nbsp;&nbsp;})
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Paste'</span>, () =&gt; <span class="js-class">document</span>.<span class="js-func">execCommand</span>(<span class="js-string">'paste'</span>))
+                        <br>&nbsp;&nbsp;.<span class="js-func">sep</span>()
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Select All'</span>, () =&gt; <span class="js-class">document</span>.<span class="js-func">execCommand</span>(<span class="js-string">'selectAll'</span>))
+                        <br>&nbsp;&nbsp;.<span class="js-func">sep</span>()
+                        <br>&nbsp;&nbsp;.<span class="js-func">action</span>(<span class="js-string">'Find...'</span>, () =&gt; <span class="js-func">showFindDialog</span>(), {
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;icon_html: <span class="js-string">'🔍'</span>
+                        <br>&nbsp;&nbsp;});
+                        </div>
+                    </div>
+                    </div>
+
             </div>
             </section>
 
@@ -61,8 +363,123 @@
             <section id="EditableText">
             <div class="card">
                 <h2>EditableText</h2>
-                <div id="editable-mount"></div>
-                <p class="muted">Double-clic pour éditer. Enter pour valider, Esc pour annuler.</p>
+                <div id="editable-mount">
+                    <div></div>
+                    <p class="muted"><b>Double-click</b> to edit. Press <b>Enter</b> to save, <b>Esc</b> to cancel.</p>
+                </div>
+
+                  <div id="quick-start">
+                    <h3>🚀 Quick Start</h3>
+                    <div class="block-js">
+                    <span class="js-const">const</span> nameField = <span class="js-keyword">new</span> <span class="js-class">EditableText</span>({
+                    <br>&nbsp;&nbsp;value: <span class="js-string">'My Document'</span>,
+                    <br>&nbsp;&nbsp;tag: <span class="js-string">'h2'</span>,
+                    <br>&nbsp;&nbsp;on_save: (value, instance) =&gt; <span class="js-func">saveFileName</span>(fileId, value)
+                    <br>});
+                    <br>
+                    <br><span class="js-comment">// Direct insertion into template strings</span>
+                    <br><span class="js-class">document</span>.<span class="js-func">querySelector</span>(<span class="js-string">'.header'</span>).<span class="js-var">innerHTML</span> = `
+                    <br>&nbsp;&nbsp;${source}
+                    <br>&nbsp;&nbsp;${nameField}
+                    <br>`;
+                    </div>
+                </div>
+
+                <div id="user-interaction">
+                    <h3>🎯 User Interaction</h3>
+                    <ul>
+                    <li><strong>Double-click</strong> to enter edit mode (focus + select all)</li>
+                    <li><strong>Enter</strong> or <strong>blur</strong> to save (calls <code>on_save</code>)</li>
+                    <li><strong>Escape</strong> to cancel (calls <code>on_cancel</code>)</li>
+                    <li>Empty or unchanged values are ignored and revert</li>
+                    </ul>
+                </div>
+
+                <hr style="border-color: var(--darker-text);"/>
+
+                <div id="api">
+                    <h3>🔧 API</h3>
+
+                    <h4>Constructor</h4>
+                    <div class="block-js">
+                    <span class="js-keyword">new</span> <span class="js-class">EditableText</span>({
+                    <br>&nbsp;&nbsp;value: <span class="js-class">string</span>,&nbsp;&nbsp;<span class="js-comment">// Initial content</span>
+                    <br>&nbsp;&nbsp;tag?: <span class="js-class">string</span>,&nbsp;&nbsp;<span class="js-comment">// 'h1'..'h6'|'span'|'div' (default: 'h2')</span>
+                    <br>&nbsp;&nbsp;id?: <span class="js-class">string</span>,&nbsp;&nbsp;<span class="js-comment">// Auto-generated if not provided</span>
+                    <br>&nbsp;&nbsp;on_save?: (value, instance) =&gt; <span class="js-class">void</span>|<span class="js-class">Promise</span>,
+                    <br>&nbsp;&nbsp;on_cancel?: (instance) =&gt; <span class="js-class">void</span>
+                    <br>})
+                    </div>
+
+                    <h4>HTML Output</h4>
+                    <p><code>String(instance)</code> returns complete HTML ready for template insertion:</p>
+                    <div class="block-html">
+                    &lt;h2 class="editable-text"&gt;<br>
+                    &nbsp;&nbsp;Content<br>
+                    &lt;/h2&gt;
+                    </div>
+                </div>
+
+                <div id="examples">
+                    <h3>📖 Examples</h3>
+
+                    <h4>Basic Usage</h4>
+                    <div class="block-js">
+                    <span class="js-const">const</span> titleField = <span class="js-keyword">new</span> <span class="js-class">EditableText</span>({
+                    <br>&nbsp;&nbsp;value: <span class="js-class">document</span>.<span class="js-var">title</span>,
+                    <br>&nbsp;&nbsp;tag: <span class="js-string">'h1'</span>,
+                    <br>&nbsp;&nbsp;on_save: <span class="js-keyword">async</span> (newTitle) =&gt; {
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="js-keyword">await</span> <span class="js-func">fetch</span>(<span class="js-string">'/api/title'</span>, { 
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;method: <span class="js-string">'POST'</span>, 
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;body: <span class="js-class">JSON</span>.<span class="js-func">stringify</span>({ title: newTitle }) 
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;});
+                    <br>&nbsp;&nbsp;}
+                    <br>});
+                    </div>
+
+                    <h4>Error Handling</h4>
+                    <div class="block-js">
+                    <span class="js-const">const</span> field = <span class="js-keyword">new</span> <span class="js-class">EditableText</span>({
+                    <br>&nbsp;&nbsp;value: <span class="js-string">'filename.txt'</span>,
+                    <br>&nbsp;&nbsp;on_save: <span class="js-keyword">async</span> (value) =&gt; {
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="js-keyword">if</span> (!<span class="js-func">isValidFileName</span>(value)) {
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="js-keyword">throw</span> <span class="js-keyword">new</span> <span class="js-class">Error</span>(<span class="js-string">'Invalid filename'</span>); <span class="js-comment">// Triggers automatic revert</span>
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;}
+                    <br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="js-keyword">await</span> <span class="js-func">saveFile</span>(value);
+                    <br>&nbsp;&nbsp;}
+                    <br>});
+                    </div>
+
+                    <h4>Multiple Instances</h4>
+                    <div class="block-js">
+                    <span class="js-const">const</span> contact = {
+                    <br>&nbsp;&nbsp;name: <span class="js-keyword">new</span> <span class="js-class">EditableText</span>({ value: <span class="js-string">'John Doe'</span>, tag: <span class="js-string">'h3'</span> }),
+                    <br>&nbsp;&nbsp;title: <span class="js-keyword">new</span> <span class="js-class">EditableText</span>({ value: <span class="js-string">'Developer'</span>, tag: <span class="js-string">'span'</span> })
+                    <br>};
+                    <br>
+                    <br><span class="js-var">element</span>.<span class="js-var">innerHTML</span> = `
+                    <br>&nbsp;&nbsp;${contact.name}
+                    <br>&nbsp;&nbsp;${contact.title}
+                    <br>`;
+                    </div>
+                </div>
+
+                <div id="css-classes">
+                    <h3>🎨 CSS Classes</h3>
+                    <div class="block-css">
+                    <span class="css-selector">.editable-text</span>              <span class="css-comment">/* Container */</span>
+                    <br><span class="css-selector">.editable-text .view</span>        <span class="css-comment">/* Display mode */</span>
+                    <br><span class="css-selector">.editable-text .edit</span>        <span class="css-comment">/* Input mode */</span>
+                    <br><span class="css-selector">.editable-text.is-editing</span>   <span class="css-comment">/* Container when editing */</span>
+                    </div>
+                </div>
+            </div>
+            </section>
+
+            <!-- Loading Screen -->
+            <section id="LoadingScreen">
+            <div class="card">
+                <h2>Loading Screen</h2>
             </div>
             </section>
 
@@ -82,60 +499,245 @@
             <section id="PopUp">
             <div class="card">
                 <h2>PopUp</h2>
-                <div class="row">
-                <button id="popup-info">Info</button>
-                <button id="popup-error">Erreur</button>
+                <div class="demo-buttons">
+                    <button id="demo-simple">Simple OK</button>
+                    <button id="demo-confirm">Confirm delete</button>
+                    <button id="demo-next">Guided step (Next)</button>
+                    <button id="demo-showcase">Showcase</button>
+                    <button id="demo-custom">Custom content (Node)</button>
+                    <button id="demo-locked">Locked (no ESC / no backdrop click)</button>
+                    <button id="demo-replace">Replace buttons at runtime</button>
                 </div>
+
+                <div id="popup-doc">
+                    <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">pop</span> =
+                        <span class="js-keyword">new</span> <span class="js-class">PopUp</span>({
+                        <br>&nbsp;&nbsp;content: <span class="js-string">'Hello from PopUp'</span>,
+                        <br>&nbsp;&nbsp;buttons: [{ label: <span class="js-string">'OK'</span>, class_name: <span class="js-string">'yes-button'</span> }]
+                        <br>}).<span class="js-func">open</span>();
+                    </div>
+
+                    <p>
+                        The component creates a full-screen wrapper (optionally dimmed), centers a dialog, 
+                        and wires ESC/backdrop behaviors depending on your options.
+                    </p>
+
+                    <h3>Basics</h3>
+                    <p>
+                        Instantiate with options; strings are injected as HTML, DOM nodes are inserted as-is. 
+                        Backdrop and ESC behaviors are opt-in/out flags. Buttons can be provided up-front or added later.
+                    </p>
+
+                    <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">modal</span> =
+                        <span class="js-keyword">new</span> <span class="js-class">PopUp</span>({
+                        <br>&nbsp;&nbsp;content: <span class="js-string">'&lt;h4&gt;Title&lt;/h4&gt;&lt;p&gt;Message...&lt;/p&gt;'</span>,
+                        <br>&nbsp;&nbsp;backdrop: <span class="js-keyword">true</span>,
+                        <br>&nbsp;&nbsp;backdrop_click_closes: <span class="js-keyword">true</span>,
+                        <br>&nbsp;&nbsp;esc_closes: <span class="js-keyword">true</span>,
+                        <br>&nbsp;&nbsp;buttons: [
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;{ label: <span class="js-string">'Cancel'</span>, class_name: <span class="js-string">'no-button'</span> },
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;{ label: <span class="js-string">'OK'</span>,     class_name: <span class="js-string">'yes-button'</span>, on_click: () =&gt; Toast.<span class="js-func">success</span>(<span class="js-string">'Done'</span>) }
+                        <br>&nbsp;&nbsp;],
+                        <br>&nbsp;&nbsp;on_open: (inst) =&gt; {}, <span class="js-comment">// dialog is in the DOM</span>
+                        <br>&nbsp;&nbsp;on_close: (inst) =&gt; {}
+                        <br>});
+                        <br><span class="js-var">modal</span>.<span class="js-func">open</span>();
+                    </div>
+
+                    <p>Generated structure:</p>
+                    <div class="block-html">
+                    &lt;div class="pop-up-wrapper" id="pop-up-0"&gt; <br/>
+                    &nbsp;&nbsp;&lt;div class="pop-up-backdrop"&gt;&lt;/div&gt;<br/>
+                    &nbsp;&nbsp;&lt;div class="pop-up"&gt;<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="pop-up-message"&gt;...content...&lt;/div&gt;<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="pop-up-buttons"&gt;...buttons...&lt;/div&gt;<br/>
+                    &nbsp;&nbsp;&lt;/div&gt;<br/>
+                    &lt;/div&gt;
+                    </div>
+
+                    <h3>Buttons & callbacks</h3>
+                    <p>
+                        Each button supports <em>label</em>, optional <em>class_name</em>, optional <em>on_click</em>, and <em>auto_close</em> (default <em>true</em>). 
+                        You can rebuild actions at runtime with <em>replace_buttons()</em>.
+                    </p>
+
+                    <div class="block-js">
+                        <span class="js-const">const</span> <span class="js-var js-var-def">flow</span> =
+                        <span class="js-keyword">new</span> <span class="js-class">PopUp</span>({ content: <span class="js-string">'Proceed with action?'</span> });
+                        <br><span class="js-var">flow</span>.<span class="js-func">replace_buttons</span>([
+                        <br>&nbsp;&nbsp;{ label: <span class="js-string">'Yes'</span>, class_name: <span class="js-string">'yes-button'</span>, on_click: () =&gt; Toast.<span class="js-func">success</span>(<span class="js-string">'OK'</span>) },
+                        <br>&nbsp;&nbsp;{ label: <span class="js-string">'No'</span>,  class_name: <span class="js-string">'no-button'</span> }
+                        <br>]).<span class="js-func">open</span>();
+                    </div>
+
+                    <h3>Shortcuts</h3>
+                    <p>
+                        Convenience constructors for common flows: quick confirm dialogs, step-by-step prompts, or 
+                        a showcase with custom background.
+                    </p>
+
+                    <div class="block-js">
+                        <span class="js-comment">// Confirm</span>
+                        <br><span class="js-class">PopUp</span>.<span class="js-func">confirm</span>(<span class="js-string">'Delete file?'</span>, {
+                        <br>&nbsp;&nbsp;yes_label: <span class="js-string">'Delete'</span>, no_label: <span class="js-string">'Cancel'</span>,
+                        <br>&nbsp;&nbsp;on_yes: () =&gt; Toast.<span class="js-func">error</span>(<span class="js-string">'Deleted'</span>)
+                        <br>}).<span class="js-func">open</span>();
+                        <br>
+                        <br><span class="js-comment">// Next</span>
+                        <br><span class="js-class">PopUp</span>.<span class="js-func">next</span>(<span class="js-string">'Step 1/3'</span>, {
+                        <br>&nbsp;&nbsp;text: <span class="js-string">'Continue'</span>,
+                        <br>&nbsp;&nbsp;on_next: () =&gt; Toast.<span class="js-func">info</span>(<span class="js-string">'Going next…'</span>),
+                        <br>&nbsp;&nbsp;backdrop: <span class="js-keyword">true</span>, backdrop_click_closes: <span class="js-keyword">false</span>
+                        <br>}).<span class="js-func">open</span>();
+                        <br>
+                        <br><span class="js-comment">// Showcase</span>
+                        <br><span class="js-class">PopUp</span>.<span class="js-func">showcase</span>(<span class="js-string">'Focus the UI with a dimmed background'</span>).<span class="js-func">open</span>();
+                    </div>
+
+                    <h3>Styling hooks</h3>
+                    <p>
+                        Customize via the base classes below. Add your own button skins using <em>class_name</em>. 
+                        Optionally layer a custom background (see <em>extra_backdrop_class</em>).
+                    </p>
+
+                    <div class="block-css">
+                    <span class="css-selector">.pop-up-wrapper</span>{ <span class="css-property">position</span>: fixed; <span class="css-property">inset</span>: 0; <span class="css-property">z-index</span>: 1000; }
+                    <br><span class="css-selector">.pop-up-backdrop</span>{ <span class="css-property">position</span>: absolute; <span class="css-property">inset</span>: 0; <span class="css-property">background</span>: rgba(0,0,0,.45); }
+                    <br><span class="css-selector">.pop-up</span>{ <span class="css-property">position</span>: absolute; <span class="css-property">top</span>: 50%; <span class="css-property">left</span>: 50%; <span class="css-property">transform</span>: translate(-50%,-50%); <span class="css-property">min-width</span>: 320px; <span class="css-property">max-width</span>: 90vw; <span class="css-property">border-radius</span>: 10px; <span class="css-property">box-shadow</span>: 0 20px 60px rgba(0,0,0,.25); <span class="css-property">overflow</span>: hidden; <span class="css-property">background</span>: #fff; <span class="css-property">color</span>: #111827; }
+                    <br>@media (prefers-color-scheme: dark){ <span class="css-selector">.pop-up</span>{ <span class="css-property">background</span>: #0f172a; <span class="css-property">color</span>: #e5e7eb; } }
+                    <br><span class="css-selector">.pop-up-message</span>{ <span class="css-property">padding</span>: 18px 20px; <span class="css-property">font</span>: 500 1rem/1.5 system-ui,-apple-system,Segoe UI,Roboto; }
+                    <br><span class="css-selector">.pop-up-buttons</span>{ <span class="css-property">display</span>: flex; <span class="css-property">gap</span>: 8px; <span class="css-property">justify-content</span>: flex-end; <span class="css-property">padding</span>: 12px 14px; <span class="css-property">background</span>: rgba(0,0,0,.04); }
+                    <br><span class="css-selector">.pop-up-buttons</span> <span class="css-selector">button</span>{ <span class="css-property">padding</span>: 8px 12px; <span class="css-property">border</span>: 1px solid rgba(0,0,0,.15); <span class="css-property">border-radius</span>: 8px; <span class="css-property">background</span>: #111827; <span class="css-property">color</span>: #fff; <span class="css-property">cursor</span>: pointer; }
+                    <br><span class="css-selector">.yes-button</span>{ <span class="css-property">background</span>: #16a34a; <span class="css-property">border-color</span>: #16a34a; }
+                    <br><span class="css-selector">.no-button</span>{ <span class="css-property">background</span>: #374151; <span class="css-property">border-color</span>: #374151; }
+                    <br><span class="css-selector">.next-button</span>{ <span class="css-property">background</span>: #2563eb; <span class="css-property">border-color</span>: #2563eb; }
+                    </div>
+
+                    <p>
+                        For an important showcase, layer a custom backdrop:
+                    </p>
+
+                    <div class="block-css">
+                    <span class="css-selector">.showcase-background</span>{<br/>
+                    &nbsp;&nbsp;<span class="css-property">position</span>: absolute; <span class="css-property">inset</span>: 0; <span class="css-property">pointer-events</span>: none;<br/>
+                    &nbsp;&nbsp;<span class="css-property">background</span>: radial-gradient(800px 400px at 30% 40%, rgba(255,255,255,.08), transparent 60%),<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;radial-gradient(600px 300px at 70% 60%, rgba(0,0,0,.25), transparent 50%);<br/>
+                    &nbsp;&nbsp;<span class="css-property">filter</span>: blur(8px);<br/>
+                    }
+                    </div>
+
+                    </div>
+
             </div>
             </section>
+
+            <!-- Toast -->
+            <section id="Toast">
+            <div class="card">
+                <h2>Toast Notifications</h2>
+                <p>
+                    Toasts are small notifications displayed at the bottom-right corner of the screen.  
+                    They disappear automatically after a short delay.  
+                    Each type has a different colored border:
+                    <strong>info</strong> (blue), <strong>success</strong> (green),
+                    <strong>warning</strong> (orange), <strong>error</strong> (red).
+                </p>
+
+                <div class="demo-buttons" style="display: flex; flex-direction: row; gap: 12px;">
+                    <button class="btn-info"    onclick="Toast.info('Information message')">Show Info</button>
+                    <button class="btn-success" onclick="Toast.success('Operation successful!')">Show Success</button>
+                    <button class="btn-warning" onclick="Toast.warning('This is a warning')">Show Warning</button>
+                    <button class="btn-error"   onclick="Toast.error('An error occurred!')">Show Error</button>
+                </div>
+
+                <div class="toast-doc">
+                    <h3>How it works</h3>
+                    <p>
+                        Use <em>Toast.info</em>, <em>Toast.success</em>, <em>Toast.warning</em>, or <em>Toast.error</em> 
+                        to create a toast of the chosen type.  
+                        Each call accepts three arguments:
+                    </p>
+
+                    <ul>
+                        <li><strong>message</strong>: the text of the toast (or raw HTML if <em>opts.html = true</em>).</li>
+                        <li><strong>duration</strong>: how long the toast stays visible (default: 3000 ms).</li>
+                        <li><strong>opts</strong>: an optional object for extra behavior:
+                        <ul>
+                            <li><em>pauseOnHover: true</em> → the toast won’t disappear while hovered.</li>
+                            <li><em>html: true</em> → render the message as HTML instead of plain text.</li>
+                        </ul>
+                        </li>
+                    </ul>
+
+                    <p>Examples:</p>
+
+                    <div class="block-js">
+                        <span class="js-comment">// Blue (info)</span>
+                        <br>Toast.<span class="js-func">info</span>(<span class="js-string">"Information message"</span>);
+                        <br>
+                        <br><span class="js-comment">// Green (success)</span>
+                        <br>Toast.<span class="js-func">success</span>(<span class="js-string">"Operation successful!"</span>);
+                        <br>
+                        <br><span class="js-comment">// Orange (warning)</span>
+                        <br>Toast.<span class="js-func">warning</span>(<span class="js-string">"Be careful, something is odd…"</span>);
+                        <br>
+                        <br><span class="js-comment">// Red (error)</span>
+                        <br>Toast.<span class="js-func">error</span>(<span class="js-string">"An error occurred!"</span>);
+                        <br>
+                        <br><span class="js-comment">// Custom duration and opts</span>
+                        <br>Toast.<span class="js-func">info</span>(
+                        <span class="js-string">"Custom toast"</span>, 
+                        <span class="js-number">5000</span>, 
+                        { pauseOnHover: <span class="js-keyword">true</span>, html: <span class="js-keyword">false</span> }
+                        );
+                    </div>
+                </div>
+
+
+
+            </div>
+            </section>
+
         </div>
     </main>
 </body>
 
 <script>
-    const { PopUp, Navigator, ContextMenu, EditableText, DataTable } = Toolbox;
+    const { PopUp, Navigator, ContextMenu, EditableText, DataTable, Toast, LoadingScreen } = Toolbox;
 
     // routing interne + focus
     const sections = Array.from(document.querySelectorAll("section"));
     const navItems = Array.from(document.querySelectorAll("#nav .item"));
-    const focusToggle = document.getElementById("focus-toggle");
-    const focusSelect = document.getElementById("focus-select");
 
     function show(id) {
-      sections.forEach(s => s.classList.toggle("active", s.id === id));
-      navItems.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + id));
-      if (focusToggle.checked) applyFocus(id);
-      history.replaceState(null, "", "#" + id);
+        sections.forEach(s => s.classList.toggle("active", s.id === id));
+        navItems.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + id));
+        history.replaceState(null, "", "#" + id)
     }
+
     function applyFocus(id) {
-      sections.forEach(s => s.style.display = (s.id === id ? "" : "none"));
+        sections.forEach(s => s.style.display = (s.id === id ? "" : "none"));
     }
+
     function clearFocus() {
-      sections.forEach(s => s.style.display = "");
+        sections.forEach(s => s.style.display = "");
     }
 
     // nav
     window.addEventListener("hashchange", () => {
-      const id = location.hash.slice(1) || "ContextMenu";
-      show(id);
-      focusSelect.value = id;
+        const id = location.hash.slice(1) || "ContextMenu";
+        show(id);
     });
     navItems.forEach(a => a.addEventListener("click", (e) => {
-      e.preventDefault();
-      const id = a.getAttribute("href").slice(1);
-      show(id);
-      focusSelect.value = id;
+        e.preventDefault();
+        const id = a.getAttribute("href").slice(1);
+        show(id);
     }));
-    focusToggle.addEventListener("change", () => {
-      const id = document.querySelector("section.active")?.id || "ContextMenu";
-      focusToggle.checked ? applyFocus(id) : clearFocus();
-    });
-    focusSelect.addEventListener("change", () => show(focusSelect.value));
 
     // init route
     show(location.hash.slice(1) || "ContextMenu");
-    focusSelect.value = location.hash.slice(1) || "ContextMenu";
-
     // --- ContextMenu demo ---
     const context_menu_demo = new ContextMenu({
         activation: 'contextmenu',
@@ -176,10 +778,15 @@
     // });
 
     // --- EditableText demo ---
-    // const edMount = document.getElementById("editable-mount");
-    // const ed = new EditableText({ value: "Double-clic pour éditer" });
-    // ed.onChange = (val) => console.log("EditableText:", val);
-    // edMount.appendChild(ed.el);
+    const edMount = document.querySelector("#editable-mount > div");
+    const ed = new EditableText({ 
+        value: "DEMO TEXT", 
+        tag: "span", 
+        id: "demo-box",
+        on_save: (v) => Toast.success(`Saved: <${v}>`),
+        on_cancel: () => Toast.warning("Edit cancelled")
+    });
+    edMount.innerHTML = `${ed}`;
 
     // --- Navigator demo ---
     // const navMount = document.getElementById("navigator-mount");
@@ -199,12 +806,80 @@
     // });
 
     // --- PopUp demo ---
-    // document.getElementById("popup-info").addEventListener("click", () => {
-    //   PopUp.info("Hello", "Ceci est un message d'information.");
-    // });
-    // document.getElementById("popup-error").addEventListener("click", () => {
-    //   PopUp.error("Oups", "Une erreur est survenue.");
-    // });
+    const $ = (id) => document.getElementById(id);
+
+    // 1) Simple OK
+    $('demo-simple').addEventListener('click', () => {
+        new PopUp({
+        content: '<h4>Hi!</h4><p>This is a minimal modal.</p>',
+        buttons: [{ label: 'OK', class_name: 'yes-button' }]
+        }).open();
+    });
+
+    // 2) Confirm delete
+    $('demo-confirm').addEventListener('click', () => {
+        PopUp.confirm('Delete file <b>report.pdf</b>?', {
+        yes_label: 'Delete',
+        no_label: 'Cancel',
+        on_yes: () => (window.Toast ? Toast.error('Deleted', 3000) : null)
+        }).open();
+    });
+
+    // 3) Guided step (Next)
+    $('demo-next').addEventListener('click', () => {
+        PopUp.next('Step 1/3 — Read the instructions.', {
+        text: 'Next',
+        on_next: () => (window.Toast ? Toast.info('Step complete') : null),
+        backdrop: true,
+        backdrop_click_closes: false
+        }).open();
+    });
+
+    // 4) Showcase (custom backdrop layer)
+    $('demo-showcase').addEventListener('click', () => {
+        PopUp.showcase('<h4>Showcase mode</h4><p>Dimmed background to highlight the dialog.</p>')
+        .open();
+    });
+
+    // 5) Custom content (DOM Node)
+    $('demo-custom').addEventListener('click', () => {
+        const box = document.createElement('div');
+        box.innerHTML = '<h4>Custom content</h4><p>You can pass a Node directly.</p>';
+        new PopUp({
+        content: box,
+        buttons: [
+            { label: 'Cancel', class_name: 'no-button' },
+            { label: 'OK', class_name: 'yes-button', on_click: () => (window.Toast ? Toast.success('OK') : null) }
+        ]
+        }).open();
+    });
+
+    // 6) Locked modal (no ESC, no backdrop click)
+    $('demo-locked').addEventListener('click', () => {
+        new PopUp({
+        content: '<h4>Locked</h4><p>Close via button only.</p>',
+        backdrop: true,
+        backdrop_click_closes: false,
+        esc_closes: false,
+        buttons: [{ label: 'Close', class_name: 'yes-button' }]
+        }).open();
+    });
+
+    // 7) Replace buttons at runtime
+    $('demo-replace').addEventListener('click', () => {
+        const pop = new PopUp({
+        content: '<h4>Runtime actions</h4><p>Buttons will change after 1.2s.</p>',
+        buttons: [{ label: 'Wait…', class_name: 'no-button', auto_close: false }]
+        }).open();
+
+        setTimeout(() => {
+        pop.replace_buttons([
+            { label: 'Cancel', class_name: 'no-button' },
+            { label: 'Confirm', class_name: 'yes-button', on_click: () => (window.Toast ? Toast.success('Confirmed') : null) }
+        ]);
+        pop.set_content('<h4>Runtime actions</h4><p>Buttons replaced.</p>');
+        }, 1200);
+    });
 </script>
 
 </html>

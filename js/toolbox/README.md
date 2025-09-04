@@ -36,15 +36,10 @@ const menu = new ContextMenu({
 #### Open only when right-clicking specific elements
 
 ```javascript
-const fileMenu = new ContextMenu({
+const menu = new ContextMenu({
   activation: 'contextmenu',
   mode: 'selector',
-  selector: '[data-menu="file"]',
-  // Enrich the callback context with useful data
-  context_fn: (event, element) => ({ 
-    id: element.dataset.id, 
-    name: element.dataset.name 
-  })
+  selector: '[data-menu="context-menu"]',
 });
 ```
 
